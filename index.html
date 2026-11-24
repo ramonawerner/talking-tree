@@ -1,0 +1,2861 @@
+<!doctype html>
+<html lang="en" data-visualize-standalone>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="no-referrer">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval' blob: data: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://esm.sh https://fonts.bunny.net https://fonts.googleapis.com https://fonts.gstatic.com https://unpkg.com https://persistent.oaistatic.com/plugins/visualize/; style-src 'unsafe-inline' blob: data: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://esm.sh https://fonts.bunny.net https://fonts.googleapis.com https://fonts.gstatic.com https://unpkg.com https://persistent.oaistatic.com/plugins/visualize/charts/; img-src blob: data: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://esm.sh https://fonts.bunny.net https://fonts.googleapis.com https://fonts.gstatic.com https://unpkg.com; font-src blob: data: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://esm.sh https://fonts.bunny.net https://fonts.googleapis.com https://fonts.gstatic.com https://unpkg.com; media-src blob: data: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://esm.sh https://fonts.bunny.net https://fonts.googleapis.com https://fonts.gstatic.com https://unpkg.com; worker-src blob:; connect-src blob: data:; frame-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<title>Talking Trees | TSF 2027 Concept Demo</title>
+<style>:root {
+  color-scheme: light dark;
+  background-color: var(
+    --background,
+    var(--color-background-primary, light-dark(rgb(255 255 255), rgb(24 24 24)))
+  ) !important;
+
+  /* Agent-facing contract; keep in sync with SKILL.md. */
+  --background: var(
+    --color-background-primary,
+    light-dark(rgb(255 255 255), rgb(24 24 24))
+  );
+  --foreground: var(
+    --color-text-primary,
+    light-dark(rgb(26 28 31), rgb(255 255 255))
+  );
+  --card: color-mix(in oklab, var(--foreground) 5%, var(--background));
+  --card-foreground: var(
+    --color-text-primary,
+    light-dark(rgb(26 28 31), rgb(255 255 255))
+  );
+  --popover: var(
+    --color-background-secondary,
+    light-dark(rgb(255 255 255), rgb(45 45 45))
+  );
+  --popover-foreground: var(
+    --color-text-primary,
+    light-dark(rgb(26 28 31), rgb(255 255 255))
+  );
+  --primary: var(
+    --color-text-info,
+    light-dark(rgb(51 156 255), rgb(131 195 255))
+  );
+  --primary-foreground: var(
+    --color-text-inverse,
+    light-dark(rgb(255 255 255), rgb(13 13 13))
+  );
+  --secondary: var(
+    --color-background-secondary,
+    light-dark(rgb(255 255 255 / 96%), rgb(54 54 54 / 96%))
+  );
+  --secondary-foreground: var(
+    --color-text-primary,
+    light-dark(rgb(26 28 31), rgb(255 255 255))
+  );
+  --muted: color-mix(in srgb, var(--foreground) 10%, transparent);
+  --muted-foreground: var(
+    --color-text-secondary,
+    light-dark(rgb(26 28 31 / 49.4%), rgb(255 255 255 / 49.8%))
+  );
+  --accent: var(
+    --color-background-info,
+    light-dark(rgb(229 242 255), rgb(13 39 63))
+  );
+  --accent-foreground: var(
+    --color-text-info,
+    light-dark(rgb(51 156 255), rgb(131 195 255))
+  );
+  --destructive: var(
+    --color-text-warning,
+    light-dark(rgb(226 85 7), rgb(255 133 73))
+  );
+  --border: var(
+    --color-border-secondary,
+    light-dark(rgb(26 28 31 / 8%), rgb(255 255 255 / 8.2%))
+  );
+  --input: var(
+    --color-border-primary,
+    light-dark(
+      rgb(26 28 31 / 11.8%),
+      color-mix(in oklab, rgb(0 0 0) 10%, transparent)
+    )
+  );
+  --ring: var(
+    --color-ring-primary,
+    light-dark(rgb(51 156 255), rgb(131 195 255 / 76%))
+  );
+  --font-size-base: var(--font-text-md-size, 16px);
+  --blue: light-dark(rgb(51 156 255), rgb(51 156 255));
+  --orange: light-dark(rgb(226 85 7), rgb(251 106 34));
+  --green: light-dark(rgb(0 162 64), rgb(64 201 119));
+  --red: light-dark(rgb(224 46 42), rgb(255 103 100));
+  --purple: light-dark(rgb(146 79 247), rgb(173 123 249));
+  --yellow: light-dark(rgb(255 195 0), rgb(255 210 64));
+  --viz-series-1: light-dark(rgb(51 156 255), rgb(131 195 255));
+  --viz-series-2: light-dark(rgb(243 136 59), rgb(245 154 86));
+  --viz-series-3: light-dark(rgb(93 201 119), rgb(116 213 139));
+  --viz-series-4: light-dark(rgb(235 119 177), rgb(240 143 192));
+  --viz-series-5: light-dark(rgb(155 121 236), rgb(170 145 239));
+  --viz-series-6: light-dark(rgb(58 185 177), rgb(90 203 194));
+
+  /* Internal implementation variables; not part of the agent contract. */
+  --font-sans:
+    -apple-system-body, ui-sans-serif, -apple-system, system-ui, "Segoe UI",
+    Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji",
+    "Segoe UI Symbol";
+  --font-mono:
+    ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono",
+    monospace;
+  --font-size-normal: max(11px, var(--font-size-base));
+  --font-size-tooltip: calc(var(--font-size-base) - 1px);
+  --font-size-small: max(11px, calc(var(--font-size-base) - 2px));
+  --font-size-h1: calc(var(--font-size-normal) * 1.7142857143);
+  --font-size-h2: calc(var(--font-size-normal) * 1.4285714286);
+  --font-size-h3: calc(var(--font-size-normal) * 1.2857142857);
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --icon-size: 16px;
+  --line-height-normal: calc(var(--font-size-normal) * 1.5);
+  --line-height-tooltip: calc(var(--font-size-tooltip) * 1.4285714286);
+  --line-height-small: calc(var(--font-size-small) + 4px);
+  --corner-shape: round;
+  --radius: var(--border-radius-lg, 8px);
+  --radius-sm: calc(var(--radius) * 0.5);
+  --radius-md: calc(var(--radius) * 0.75);
+  --radius-lg: var(--radius);
+  --radius-2xl: calc(var(--radius) * 2);
+  --radius-full: 9999px;
+  --shadow-sm: 0 1px 2px -1px rgb(0 0 0 / 8%);
+  --checkmark-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 17 17'%3E%3Cpath d='M12.8961 3.64101C13.1297 3.41418 13.4984 3.37523 13.7779 3.56581C14.0571 3.75635 14.1554 4.11331 14.0299 4.41347L13.9615 4.53847L7.71151 13.7045C7.59411 13.8767 7.4063 13.9877 7.19881 14.0072C6.99136 14.0267 6.78564 13.9533 6.63826 13.806L2.88826 10.056L2.79842 9.9457C2.6192 9.67407 2.64927 9.30496 2.88826 9.06581C3.12738 8.82669 3.49647 8.79676 3.76815 8.97597L3.8785 9.06581L7.03084 12.2182L12.8053 3.74941L12.8961 3.64101Z'/%3E%3C/svg%3E");
+
+  /* Legacy aliases; not part of the current agent contract. */
+  --viz-bg: transparent;
+  --viz-panel: var(--card);
+  --viz-border: var(--border);
+  --viz-text: var(--foreground);
+  --viz-muted: var(--muted-foreground);
+  --viz-accent: var(--primary);
+  --viz-accent-text: var(--primary-foreground);
+  --viz-accent-bg: var(--accent);
+  --viz-font-size: var(--font-size-base);
+  --viz-warning: var(--destructive);
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html > body {
+  /* Preserve MCP aliases for older inline renderers without creating :root cycles. */
+  --color-background-primary: var(
+    --background,
+    light-dark(rgb(255 255 255), rgb(24 24 24))
+  );
+  --color-text-primary: var(
+    --foreground,
+    light-dark(rgb(26 28 31), rgb(255 255 255))
+  );
+  --color-border-secondary: var(
+    --border,
+    light-dark(rgb(26 28 31 / 8%), rgb(255 255 255 / 8.2%))
+  );
+
+  margin: 0;
+  padding: var(--visualize-paint-gutter, 0px);
+  color: var(--foreground);
+  background: transparent !important;
+  font-family: var(--font-sans) !important;
+  -webkit-font-smoothing: antialiased;
+  font-size: var(--font-size-base);
+  line-height: calc(var(--font-size-base) * 1.625);
+  font-weight: var(--font-weight-normal);
+}
+
+.cursor-interaction {
+  cursor: var(--cursor-interaction, pointer);
+}
+
+a {
+  color: color-mix(in srgb, var(--viz-accent) 80%, var(--viz-text) 20%);
+  cursor: var(--cursor-interaction, pointer);
+  text-decoration: none;
+  text-underline-offset: 2px;
+  font-weight: inherit;
+}
+
+a:is(:hover, :focus-visible) {
+  text-decoration-line: underline;
+  text-decoration-style: dashed;
+  text-decoration-thickness: 0.5px;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p {
+  margin-block: 0;
+}
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+li,
+.table {
+  font-family: var(--font-sans);
+}
+
+h1 {
+  font-size: calc(var(--font-size-base) * 1.5);
+  line-height: 1.3333333333;
+}
+
+h2 {
+  font-size: calc(var(--font-size-base) * 1.25);
+  line-height: 1.4;
+}
+h3 {
+  font-size: calc(var(--font-size-base) * 1.125);
+  line-height: 1.5555555556;
+}
+h4 {
+  font-size: var(--font-size-base);
+  line-height: 1.5;
+}
+h5,
+h6 {
+  font-size: var(--font-size-base);
+  line-height: calc(var(--font-size-base) * 1.625);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+b,
+strong,
+th {
+  font-weight: 600;
+}
+
+code:not(pre code) {
+  display: inline;
+  padding: 1px 6px;
+  border-radius: var(--radius-sm);
+  corner-shape: var(--corner-shape);
+  background: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 0.92em;
+  overflow-wrap: anywhere;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+  word-break: break-word;
+}
+pre,
+pre code {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 20px;
+}
+
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+
+.table {
+  width: 100%;
+  color: var(--foreground);
+  font: inherit;
+  text-align: start;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: calc(var(--font-size-base) * 0.875);
+  line-height: calc(var(--font-size-base) * 1.625);
+  font-family: var(--font-sans);
+}
+
+.table :is(th, td) {
+  padding-block: 10px;
+  padding-inline: 0 24px;
+  overflow-wrap: anywhere;
+  border-bottom: 1px solid var(--border);
+  text-align: start;
+  vertical-align: top;
+  border-bottom-color: color-mix(in srgb, var(--foreground) 5%, transparent);
+}
+.table :is(th, td):not(:last-child) {
+  padding-inline-end: calc(var(--font-size-base) * 1.5);
+}
+
+.table-responsive > .table :is(th, td) {
+  overflow-wrap: break-word;
+}
+
+.table :is(th, td):last-child {
+  padding-inline-end: 0;
+}
+
+.table :is(caption, thead th) {
+  font-weight: 600;
+}
+
+.table thead :is(th, td) {
+  border-bottom-color: var(--border-strong, var(--input));
+  padding-block: calc(var(--font-size-base) / 2);
+  line-height: var(--font-size-base);
+}
+
+.table tbody tr:last-child :is(th, td) {
+  border-bottom: 0;
+}
+.table tbody :is(th, td) {
+  padding-block: calc(var(--font-size-base) * 0.625);
+}
+
+.table.table-sm :is(th, td) {
+  padding-block: 8px;
+}
+
+.table.table-sm :is(th, td):not(:last-child) {
+  padding-inline-end: 16px;
+}
+
+.table :is(.text-end, [align="right"]) {
+  text-align: end;
+  font-variant-numeric: tabular-nums;
+}
+
+.table :is(.text-center, [align="center"]) {
+  text-align: center;
+}
+
+.table .text-nowrap {
+  white-space: nowrap;
+}
+
+#widget {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  padding: 0;
+  background: transparent !important;
+}
+
+.card {
+  min-width: 0;
+  padding: 12px;
+  overflow: hidden;
+  overflow-wrap: break-word;
+  border-radius: var(--radius-2xl);
+  corner-shape: var(--corner-shape);
+  color: var(--card-foreground);
+  background: var(--card);
+}
+
+.widget {
+  min-width: 0;
+  overflow: hidden;
+  border: 0;
+  border-radius: var(--radius-lg);
+  corner-shape: var(--corner-shape);
+  box-shadow: 0 0 0 0.5px var(--border-strong, var(--border));
+  color: var(--foreground);
+  background: var(--background);
+}
+
+#widget > :not(.card, .widget, .progress) {
+  width: 100% !important;
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.tooltip {
+  position: fixed;
+  z-index: 50;
+  top: 0;
+  left: 0;
+  width: max-content;
+  max-width: min(
+    20rem,
+    var(--tooltip-available-width, calc(100vw - 10px)),
+    calc(100vw - 10px)
+  );
+  max-height: min(
+    var(--tooltip-available-height, calc(100vh - 10px)),
+    calc(100vh - 10px)
+  );
+  border: 1px solid var(--border);
+  corner-shape: var(--corner-shape);
+  overflow-wrap: break-word;
+  white-space: normal;
+  pointer-events: none;
+  user-select: none;
+  font-family: var(--font-sans);
+  padding: 5px 12px;
+  border-color: color-mix(
+    in oklab,
+    light-dark(var(--primary-foreground), var(--foreground)) 5%,
+    transparent
+  );
+  border-radius: var(--radius-2xl);
+  color: light-dark(var(--primary-foreground), var(--foreground));
+  background: light-dark(var(--foreground), var(--popover));
+  box-shadow: 0 8px 18px rgb(15 23 42 / 20%);
+  letter-spacing: -0.15px;
+  font-size: calc(var(--font-size-base) * 14 / 16);
+  font-size: round(nearest, calc(var(--font-size-base) * 14 / 16), 1px);
+  font-weight: 600;
+  line-height: 18px;
+  text-align: center;
+}
+
+.viz-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(max(180px, 24%), 1fr));
+  gap: 10px;
+}
+
+.viz-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.viz-stat-value {
+  font-size: var(--font-size-h2);
+  font-weight: var(--font-weight-medium);
+  line-height: 1.25;
+}
+
+.viz-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+hr {
+  width: 100%;
+  height: 1px;
+  margin-block: 6px;
+  border: 0;
+  background: var(--border);
+}
+
+.nav {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 4px;
+}
+
+.progress {
+  display: flex;
+  height: 8px;
+  margin-block: calc((var(--line-height-normal, 1.5em) - 8px) / 2);
+  overflow: hidden;
+  border: 0;
+  border-radius: var(--radius-full);
+  background: var(--muted);
+}
+
+.progress-bar:only-child {
+  border-radius: var(--radius-full);
+}
+
+.progress-bar {
+  height: 100%;
+  flex-shrink: 0;
+  border: 0;
+  background: var(--viz-series-1);
+}
+
+.viz-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  color: color-mix(in srgb, var(--foreground) 40%, var(--muted-foreground));
+  background: color-mix(in srgb, var(--foreground) 5%, transparent);
+  font-family: var(--font-sans);
+  font-size: calc(var(--font-size-base) * 14 / 16);
+  font-size: round(nearest, calc(var(--font-size-base) * 14 / 16), 1px);
+  font-weight: var(--font-weight-normal);
+  line-height: 1;
+}
+
+small,
+.text-small {
+  font-size: var(--font-size-small);
+  line-height: var(--line-height-small);
+}
+
+.text-muted {
+  color: var(--muted-foreground);
+}
+
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.viz-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.viz-controls > .form-label {
+  display: grid;
+  min-width: min(100%, 260px);
+  flex: 1 1 280px;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: baseline;
+  gap: 2px 12px;
+  margin-bottom: 0;
+}
+
+.viz-controls > .form-label > :is(.form-control, .form-range, .form-select) {
+  grid-column: 1 / -1;
+}
+
+.btn,
+.nav-link,
+.form-check-input,
+.form-control,
+.form-range,
+.form-select {
+  font: inherit;
+}
+
+/* Match inline alignment without overriding a containing flex or grid layout. */
+.btn,
+.nav-link,
+.form-control,
+.form-select,
+.form-range,
+.form-check {
+  vertical-align: middle;
+}
+
+.btn,
+.nav-link {
+  --btn-size: calc(12px + 2 * var(--control-spacing, 12px));
+  appearance: button;
+  display: inline-flex;
+  inline-size: fit-content;
+  max-inline-size: 100%;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  margin: 0;
+  padding: 0 8px;
+  -webkit-app-region: no-drag;
+  border: 1px solid var(--input);
+  corner-shape: var(--corner-shape);
+  cursor: var(--cursor-interaction, pointer);
+  text-align: center;
+  text-decoration: none;
+  white-space: nowrap;
+  user-select: none;
+  -webkit-font-smoothing: inherit;
+  font-family: var(--font-sans);
+  height: fit-content;
+  min-height: var(--btn-size);
+  padding-inline: var(--control-spacing, 12px);
+  border-color: transparent;
+  border-radius: var(--radius-full);
+  color: var(--foreground);
+  background: color-mix(in srgb, var(--foreground) 5%, transparent);
+  font-size: calc(var(--font-size-base) * 14 / 16);
+  font-size: round(nearest, calc(var(--font-size-base) * 14 / 16), 1px);
+  font-weight: var(--font-weight-normal);
+  line-height: 18px;
+}
+
+.btn {
+  border-color: var(--border);
+  color: var(--secondary-foreground);
+  background: var(--secondary);
+}
+
+/* Codex Button size="compact"; appearance stays with the button variant. */
+.btn-sm {
+  --btn-size: 24px;
+  padding-inline: 8px;
+  font-size: calc(var(--font-size-base) * 12 / 16);
+  font-size: round(nearest, calc(var(--font-size-base) * 12 / 16), 1px);
+  line-height: 16px;
+}
+
+.btn:is(.btn-block, .viz-tile) {
+  inline-size: 100%;
+}
+
+.btn.viz-tile {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
+
+a.btn {
+  cursor: var(--cursor-interaction, pointer);
+  text-decoration: none;
+}
+
+.btn:not(:disabled):hover {
+  background: light-dark(
+    color-mix(in srgb, var(--foreground) 5.5%, transparent),
+    color-mix(in srgb, var(--foreground) 8%, transparent)
+  );
+}
+
+.nav-link:not(:disabled):not([aria-disabled="true"]):hover {
+  background: color-mix(in srgb, var(--foreground) 10%, transparent);
+}
+
+.btn-primary {
+  border-color: var(--border);
+  color: var(--primary-foreground);
+  background: var(--foreground);
+  background-clip: border-box;
+}
+
+.btn-primary .text-muted {
+  color: color-mix(in srgb, var(--primary-foreground) 50%, transparent);
+}
+
+.btn-primary:not(:disabled):hover {
+  background: color-mix(in srgb, var(--foreground) 80%, transparent);
+  background-clip: border-box;
+}
+
+.btn-ghost {
+  border-color: transparent;
+  color: var(--muted-foreground);
+  background: transparent;
+}
+
+.btn-ghost:not(:disabled):hover {
+  color: var(--muted-foreground);
+  background: light-dark(
+    color-mix(in srgb, var(--foreground) 5.5%, transparent),
+    color-mix(in srgb, var(--foreground) 8%, transparent)
+  );
+}
+
+.nav-pills .nav-link {
+  min-width: 0;
+  border-color: transparent;
+  color: var(--muted-foreground);
+  background: transparent;
+}
+
+.nav-justified .nav-link {
+  flex: 1 1 0;
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
+
+.nav-pills .nav-link.active {
+  color: var(--foreground);
+  background: var(--muted);
+}
+
+/* Shared preview chrome; product styles stay inside each variant. */
+.viz-dotted-background {
+  background-image: radial-gradient(
+    circle,
+    color-mix(in srgb, var(--foreground) 14%, transparent) 0.8px,
+    transparent 0.8px
+  );
+  background-position: center;
+  background-size: 16px 16px;
+}
+
+.viz-carousel {
+  position: relative;
+  min-width: 0;
+}
+
+.viz-carousel:has(> .viz-carousel-controls) {
+  min-height: calc(60px + var(--viz-carousel-picker-height, 0px));
+  padding-bottom: 60px;
+}
+
+.viz-carousel > [data-variant][hidden] {
+  display: none !important;
+}
+
+.viz-carousel > [data-variant] {
+  isolation: isolate;
+}
+
+.viz-carousel-controls {
+  --viz-carousel-hover: light-dark(
+    color-mix(in srgb, var(--foreground) 5.4%, transparent),
+    color-mix(in srgb, var(--foreground) 7.8%, transparent)
+  );
+  position: absolute;
+  z-index: 2;
+  bottom: 8px;
+  left: 50%;
+  display: flex;
+  width: max-content;
+  /* Leave room for the host's design-controls launcher at the trailing edge. */
+  max-width: calc(100% - 96px);
+  align-items: center;
+  gap: 0;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  color: var(--foreground);
+  background: var(--background);
+  font-family: var(--font-sans);
+  /* Match the settings dropdown chrome independently of the content font size. */
+  font-size: 13px;
+  font-weight: var(--font-weight-normal);
+  line-height: 18px;
+  transform: translateX(-50%);
+  user-select: none;
+}
+
+/* Keep authored mockup button styles out of the shared carousel chrome. */
+.viz-carousel-controls button,
+.viz-carousel-picker > summary {
+  display: flex !important;
+  height: auto !important;
+  min-height: 30px;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 4px;
+  padding: 0 6px !important;
+  -webkit-app-region: no-drag;
+  border: 0 !important;
+  border-radius: 14px !important;
+  color: inherit !important;
+  background: transparent !important;
+  font: inherit !important;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.viz-carousel-controls > button,
+.viz-carousel-picker > summary {
+  position: relative;
+  isolation: isolate;
+}
+
+.viz-carousel-controls > button {
+  --icon-size: 16px;
+  width: 30px !important;
+  padding: 0 !important;
+}
+
+.viz-carousel-picker > summary {
+  padding-inline: 12px !important;
+}
+
+.viz-carousel-controls .viz-carousel-caret {
+  width: 14px;
+  height: 14px;
+  flex: none;
+  margin: 0;
+  color: inherit;
+  transform: rotate(180deg);
+}
+
+.viz-carousel-controls > button > svg,
+.viz-carousel-controls .viz-carousel-caret,
+.viz-carousel-count {
+  opacity: 0.5;
+}
+
+.viz-carousel-controls > button::before,
+.viz-carousel-picker > summary::before {
+  position: absolute;
+  z-index: -1;
+  inset: 3px;
+  border-radius: 12px;
+  content: "";
+  pointer-events: none;
+}
+
+.viz-carousel-controls > button:hover::before,
+.viz-carousel-picker > summary:hover::before {
+  background: var(--viz-carousel-hover);
+}
+
+.viz-carousel-controls > button,
+.viz-carousel-controls [data-lucide],
+.viz-carousel-controls .lucide {
+  flex-shrink: 0;
+}
+
+.viz-carousel-picker {
+  min-width: 0;
+}
+
+.viz-carousel-picker > summary {
+  min-width: 0;
+  list-style: none;
+}
+
+.viz-carousel-picker > summary::-webkit-details-marker {
+  display: none;
+}
+
+.viz-carousel-count {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.viz-carousel-name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.viz-carousel-options {
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + 4px);
+  left: 0;
+  display: flex;
+  max-height: 240px;
+  flex-direction: column;
+  gap: 2px;
+  overflow: auto;
+  padding: 4px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--background);
+  box-shadow: 0 4px 12px light-dark(rgb(0 0 0 / 6%), rgb(0 0 0 / 25%));
+}
+
+.viz-carousel-options > button {
+  border-radius: max(0px, calc(var(--radius-lg) - 5px)) !important;
+  width: 100% !important;
+  min-height: 28px;
+  justify-content: flex-start !important;
+  padding: 4px 8px !important;
+  font-size: var(--font-size-small) !important;
+  text-align: start;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.viz-carousel-options > [aria-current="true"],
+.viz-carousel-options > button:hover {
+  background: var(--viz-carousel-hover) !important;
+}
+
+.btn:disabled,
+.nav-link:disabled,
+.nav-link[aria-disabled="true"] {
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+
+[data-lucide] {
+  stroke-width: 1.6;
+}
+
+.form-label {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--foreground);
+}
+
+.form-control {
+  display: block;
+  width: 100%;
+  padding: 0 8px;
+  outline: none;
+  border: 1px solid var(--input);
+  corner-shape: var(--corner-shape);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  height: calc(12px + 2 * var(--control-spacing, 12px));
+  min-height: calc(12px + 2 * var(--control-spacing, 12px));
+  padding-inline: calc(4px + var(--control-spacing, 12px) / 2);
+  border-color: var(--input);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--popover) 96%, transparent);
+  font-size: calc(var(--font-size-base) * 14 / 16);
+  font-size: round(nearest, calc(var(--font-size-base) * 14 / 16), 1px);
+  font-weight: var(--font-weight-normal);
+  line-height: 1.4285714286;
+}
+.form-control:is(
+  [type="file"],
+  [type="date"],
+  [type="datetime-local"],
+  [type="month"],
+  [type="week"],
+  [type="color"]
+) {
+  height: calc(12px + 2 * var(--control-spacing, 12px));
+  min-height: calc(12px + 2 * var(--control-spacing, 12px));
+  line-height: 18px;
+}
+.form-control:is(
+  [type="date"],
+  [type="datetime-local"],
+  [type="month"],
+  [type="week"]
+) {
+  padding-inline: var(--control-spacing, 12px);
+}
+
+.form-control::placeholder {
+  color: var(--muted-foreground);
+}
+
+.form-control[type="file"] {
+  overflow: hidden;
+  cursor: var(--cursor-interaction, pointer);
+  padding: 0;
+}
+
+.form-control[type="file"]::file-selector-button {
+  padding: 0 8px;
+  border: 0;
+  border-right: 1px solid var(--input);
+  color: var(--secondary-foreground);
+  background: var(--secondary);
+  cursor: inherit;
+  font: inherit;
+  min-height: calc(10px + 2 * var(--control-spacing, 12px));
+  padding-inline: var(--control-spacing, 12px);
+  margin-inline-end: var(--control-spacing, 12px);
+}
+
+.form-control[type="file"]:not(:disabled):hover::file-selector-button {
+  background: color-mix(in srgb, var(--foreground) 6%, var(--secondary));
+}
+
+.form-control-color[type="color"] {
+  width: 40px;
+  height: calc(12px + 2 * var(--control-spacing, 12px));
+  padding: 3px;
+  cursor: var(--cursor-interaction, pointer);
+}
+
+.form-control-color[type="color"]::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
+
+.form-control-color[type="color"]::-webkit-color-swatch {
+  border: 0;
+  border-radius: calc(var(--radius-lg) - 4px);
+  corner-shape: var(--corner-shape);
+}
+
+textarea.form-control {
+  height: auto;
+  resize: vertical;
+  min-height: 96px;
+  padding: 8px 10px;
+}
+
+.form-control:focus-visible {
+  border-color: var(--ring);
+  box-shadow: none;
+}
+.form-control:disabled {
+  color: var(--muted-foreground);
+  background: color-mix(in srgb, var(--foreground) 5%, transparent);
+  opacity: 1;
+}
+.form-control[aria-invalid="true"] {
+  border-color: var(--red);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--red) 20%, transparent);
+}
+
+.form-control:disabled,
+.form-select:disabled {
+  cursor: not-allowed;
+}
+
+.form-select {
+  appearance: none;
+  display: block;
+  width: 100%;
+  height: fit-content;
+  min-height: calc(12px + 2 * var(--control-spacing, 12px));
+  margin: 0;
+  /* The secondary icon role is 14px at compact density and 16px at web density. */
+  --icon-size: calc(10px + var(--control-spacing, 12px) / 2);
+  /* Settings dropdowns retain a 12px inset and a 4px text-to-chevron gap. */
+  padding: 0 calc(16px + var(--icon-size)) 0 12px;
+  outline: none;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  corner-shape: var(--corner-shape);
+  color: var(--foreground);
+  background-color: var(--secondary);
+  background-image:
+    linear-gradient(
+      45deg,
+      transparent calc(50% - 0.6px),
+      var(--muted-foreground) calc(50% - 0.6px) calc(50% + 0.6px),
+      transparent calc(50% + 0.6px)
+    ),
+    linear-gradient(
+      135deg,
+      transparent calc(50% - 0.6px),
+      var(--muted-foreground) calc(50% - 0.6px) calc(50% + 0.6px),
+      transparent calc(50% + 0.6px)
+    );
+  background-position:
+    calc(100% - 12px - var(--icon-size) / 2) 50%,
+    calc(100% - 12px - var(--icon-size) * 0.18) 50%;
+  background-repeat: no-repeat;
+  background-size: calc(var(--icon-size) * 0.32) calc(var(--icon-size) * 0.32);
+  cursor: var(--cursor-interaction, default);
+  font-size: calc(var(--font-size-base) * 14 / 16);
+  font-size: round(nearest, calc(var(--font-size-base) * 14 / 16), 1px);
+  font-weight: var(--font-weight-normal);
+  line-height: 18px;
+}
+
+.form-select :is(option, optgroup) {
+  color: var(--popover-foreground);
+  background-color: var(--popover);
+}
+
+.form-select :is(option, optgroup):disabled {
+  color: var(--muted-foreground);
+}
+
+.form-select:not(:disabled):hover {
+  background-color: light-dark(
+    color-mix(in srgb, var(--foreground) 5.5%, transparent),
+    color-mix(in srgb, var(--foreground) 8%, transparent)
+  );
+}
+
+.form-select:focus-visible {
+  box-shadow: 0 0 0 2px var(--ring);
+}
+.form-select:disabled {
+  opacity: 0.4;
+}
+
+.form-check {
+  display: flex;
+  min-height: calc(12px + 2 * var(--control-spacing, 12px));
+  align-items: center;
+  gap: 6px;
+}
+
+.form-check-input {
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  flex: 0 0 auto;
+  margin: 0;
+  border: 1px solid var(--input);
+  color: var(--primary-foreground);
+  background-color: transparent;
+  cursor: var(--cursor-interaction, default);
+  transition:
+    background-color 150ms,
+    border-color 150ms,
+    box-shadow 150ms;
+}
+
+.form-check:not(.form-switch) .form-check-input[type="checkbox"] {
+  corner-shape: round;
+  box-shadow: var(--shadow-sm);
+  position: relative;
+  width: calc(10px + var(--control-spacing, 12px) / 2);
+  height: calc(10px + var(--control-spacing, 12px) / 2);
+  border-color: var(--border-strong, var(--input));
+  border-radius: calc(var(--radius-sm) / 2);
+  background-color: transparent;
+  color: var(--foreground);
+}
+
+.form-check:not(.form-switch)
+  .form-check-input:not(:disabled):not(:checked):hover {
+  background-color: var(--card);
+}
+
+.form-check:not(.form-switch)
+  .form-check-input[type="checkbox"]:is(:checked, :indeterminate) {
+  border-color: var(--border-strong, var(--input));
+  background-color: color-mix(in srgb, var(--popover) 96%, transparent);
+}
+
+.form-check:not(.form-switch)
+  .form-check-input[type="checkbox"]:checked::before {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: var(--primary-foreground);
+  content: "";
+  mask: var(--checkmark-image) center / 12px 12px no-repeat;
+  background-color: var(--foreground);
+}
+.form-check:not(.form-switch)
+  .form-check-input[type="checkbox"]:indeterminate::before {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 65%;
+  height: 6.65%;
+  margin: auto;
+  border-radius: var(--radius-full);
+  background: var(--foreground);
+  mask: none;
+  content: "";
+}
+
+.form-check-input[type="radio"] {
+  border-radius: var(--radius-full);
+  width: 16px;
+  height: 16px;
+  border: 0;
+  box-shadow: inset 0 0 0 1px var(--input);
+}
+
+.form-check-input[type="radio"]:checked {
+  border: 0;
+  background: radial-gradient(
+    circle,
+    var(--primary-foreground) 0 3px,
+    var(--foreground) 3px
+  );
+  box-shadow: none;
+}
+
+.form-check:not(.form-switch) .form-check-input:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+.form-check:not(.form-switch) .form-check-input[type="checkbox"]:focus-visible {
+  border-color: var(--ring);
+  outline: none;
+  box-shadow: 0 0 0 2px var(--ring);
+}
+
+.form-check:not(.form-switch) .form-check-input:disabled {
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.form-check:not(.form-switch) .form-check-input:disabled + .form-check-label {
+  cursor: not-allowed;
+}
+.form-check:not(.form-switch) .form-check-input[type="radio"]:disabled,
+.form-check:not(.form-switch)
+  .form-check-input[type="radio"]:disabled
+  + .form-check-label {
+  opacity: 0.5;
+}
+
+.form-switch .form-check-input:disabled,
+.form-switch .form-check-input:disabled + .form-check-label {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.form-check-label {
+  color: var(--foreground);
+  cursor: var(--cursor-interaction, default);
+}
+
+.form-switch .form-check-input {
+  position: relative;
+  width: 32px;
+  height: 20px;
+  border: 0;
+  border-radius: var(--radius-full);
+  background: var(--muted);
+  box-shadow: none;
+  transition: background-color 200ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+.form-switch .form-check-input::before {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 16px;
+  height: 16px;
+  box-sizing: border-box;
+  border: 1px solid light-dark(var(--primary-foreground), var(--foreground));
+  border-radius: var(--radius-full);
+  box-shadow: var(--shadow-sm);
+  content: "";
+  transform: translate(2px, -50%);
+  transition: transform 200ms cubic-bezier(0, 0, 0.2, 1);
+  border-color: #fff;
+  background: #fff;
+}
+
+.form-switch .form-check-input:checked {
+  background: var(--blue);
+}
+
+.form-switch .form-check-input:checked::before {
+  transform: translate(14px, -50%);
+}
+
+.form-switch .form-check-input:focus-visible {
+  box-shadow: 0 0 0 2px var(--ring);
+  outline: none;
+}
+
+.form-range {
+  appearance: none;
+  display: block;
+  width: 100%;
+  flex: 1;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  accent-color: var(--primary);
+  height: calc(12px + 2 * var(--control-spacing, 12px));
+  min-height: calc(12px + 2 * var(--control-spacing, 12px));
+  outline: none;
+  border-radius: var(--radius-full);
+  color: var(--foreground);
+  background: transparent;
+}
+
+.form-range::-webkit-slider-runnable-track {
+  background: var(--form-range-track, var(--border));
+  height: 2px;
+  border-radius: var(--radius-full);
+}
+
+.form-range::-webkit-slider-thumb {
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  margin-top: -9px;
+  border-color: transparent;
+  background: currentColor;
+  box-shadow: var(--shadow-sm);
+}
+
+/* Outline the native track and thumb, preserving the larger input hit area. */
+.form-range:focus-visible::-webkit-slider-runnable-track {
+  outline: 2px auto Highlight;
+  outline-color: -webkit-focus-ring-color;
+}
+
+.form-range::-moz-range-track {
+  background: var(--form-range-track, var(--border));
+  height: 2px;
+  border-radius: var(--radius-full);
+}
+
+.form-range::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  border-color: transparent;
+  background: currentColor;
+  box-shadow: var(--shadow-sm);
+}
+
+.form-range:focus-visible::-moz-range-thumb {
+  outline: 2px solid Highlight;
+  outline-offset: 2px;
+}
+
+.form-range:disabled {
+  opacity: 1;
+  cursor: default;
+}
+
+.btn:not(.btn-primary, .viz-tile):is(
+  [aria-pressed="true"],
+  [aria-selected="true"],
+  .is-selected
+) {
+  border-color: transparent;
+  color: var(--primary-foreground);
+  background: var(--blue);
+}
+
+.btn.viz-tile:is([aria-pressed="true"], [aria-selected="true"], .is-selected) {
+  border-color: var(--primary);
+  box-shadow: inset 0 0 0 1px var(--primary);
+}
+
+.btn:focus-visible,
+.nav-link:focus-visible {
+  outline-offset: 2px;
+  outline: none;
+  box-shadow: 0 0 0 2px var(--ring);
+}
+
+.viz-carousel-controls :is(button, summary):focus-visible {
+  outline: 2px solid var(--ring) !important;
+  outline-offset: 2px !important;
+}
+
+/* Web recipes are the default, including on renderers without inline style queries. */
+@supports (border-radius: if(style(--corner-shape: round): 1px; else: 2px)) {
+  /* Match the host's proportional text-sm scale at every text preference. */
+  .tooltip,
+  .viz-badge,
+  .btn,
+  .nav-link,
+  .form-control,
+  .form-select {
+    font-size: if(
+      style(--corner-shape: round): round(
+          nearest,
+          calc(var(--font-size-base) * 14 / 16),
+          1px
+        );
+        else: round(nearest, calc(var(--font-size-base) * 13 / 14), 1px)
+    );
+  }
+
+  .btn-sm {
+    font-size: if(
+      style(--corner-shape: round): round(
+          nearest,
+          calc(var(--font-size-base) * 12 / 16),
+          1px
+        );
+        else: round(nearest, calc(var(--font-size-base) * 12 / 14), 1px)
+    );
+  }
+
+  .btn,
+  .nav-link,
+  .form-select {
+    border-radius: if(
+      style(--corner-shape: round): var(--radius-full); else: var(--radius-lg)
+    );
+  }
+
+  .form-check:not(.form-switch) .form-check-input[type="checkbox"] {
+    border-radius: if(
+      style(--corner-shape: round): calc(var(--radius-sm) / 2);
+        else: calc(var(--radius-lg) * 0.4)
+    );
+  }
+
+  .tooltip {
+    font-weight: if(
+      style(--corner-shape: round): 600; else: var(--font-weight-normal)
+    );
+  }
+}
+
+@media (pointer: coarse) {
+  .viz-carousel:has(> .viz-carousel-controls) {
+    min-height: calc(76px + var(--viz-carousel-picker-height, 0px));
+    padding-bottom: 76px;
+  }
+
+  .btn,
+  .nav-link,
+  .viz-carousel-controls button,
+  .viz-carousel-picker > summary,
+  .form-control,
+  .form-select {
+    --btn-size: 44px;
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  /* Keep small-screen WebKit from zooming when a text field receives focus. */
+  .form-control,
+  .form-select {
+    font-size: max(16px, calc(var(--font-size-base) * 14 / 16));
+    font-size: max(
+      16px,
+      round(nearest, calc(var(--font-size-base) * 14 / 16), 1px)
+    );
+  }
+  .form-control:is(
+    [type="file"],
+    [type="date"],
+    [type="datetime-local"],
+    [type="month"],
+    [type="week"],
+    [type="time"],
+    [type="color"]
+  ) {
+    height: 44px;
+    min-height: 44px;
+    font-size: max(16px, calc(var(--font-size-base) * 14 / 16));
+    font-size: max(
+      16px,
+      round(nearest, calc(var(--font-size-base) * 14 / 16), 1px)
+    );
+  }
+
+  .form-control[type="file"]::file-selector-button {
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  .form-control-color[type="color"] {
+    width: 44px;
+    height: 44px;
+  }
+
+  .form-control:is(
+    [type="date"],
+    [type="datetime-local"],
+    [type="month"],
+    [type="time"],
+    [type="week"]
+  ) {
+    min-width: 0;
+    max-width: 100%;
+    padding-block: 8px;
+  }
+
+  .form-check {
+    min-height: 44px;
+    padding-inline: 15px;
+  }
+
+  .form-check-input {
+    position: relative;
+  }
+
+  .form-check-input::after {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 44px;
+    height: 44px;
+    content: "";
+    transform: translate(-50%, -50%);
+  }
+
+  .form-check-label {
+    display: inline-flex;
+    min-width: 44px;
+    min-height: 44px;
+    align-items: center;
+  }
+
+  .form-range {
+    height: 44px;
+    touch-action: pan-y;
+  }
+}
+
+svg {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+#widget > svg {
+  width: 100%;
+}
+
+/* Model-authored chart rules can otherwise stretch icons after these styles load. */
+svg.lucide {
+  display: block;
+  width: var(--icon-size) !important;
+  height: var(--icon-size) !important;
+  flex: none;
+  margin: 0 !important;
+  stroke-width: 1.6;
+}
+
+.text-warning,
+.text-destructive {
+  color: var(--destructive);
+}
+
+html>body{padding:0}</style>
+<meta name="description" content="An interactive concept for Talking Trees, a proposed Cornell campus tree physiology and sustainability education pilot. All readings and visitor examples are illustrative.">
+<meta name="robots" content="noindex,nofollow">
+<style>
+  :root{color-scheme:light dark;}
+  html,body{margin:0;min-height:100%;}
+  body{padding:clamp(0px,2vw,22px)!important;box-sizing:border-box;background:light-dark(#eef2e8,#10211a)!important;}
+  #tt-three-stories{width:100%;max-width:540px!important;margin:0 auto;font-size:16px;line-height:1.48;box-shadow:0 12px 40px #172e1b13}
+  #tt-three-stories svg.plot{width:100%;max-width:370px;height:auto;justify-self:center;margin:0 auto;}
+  #tt-three-stories #tt-schematic-drafts svg.visual{max-width:300px!important;width:100%;height:auto;justify-self:center;}
+  #tt-three-stories button,#tt-three-stories summary,#tt-three-stories .photo-button{cursor:pointer;}
+  #tt-three-stories .intro .small,#tt-three-stories .description,#tt-three-stories .caption{font-size:14px;}
+  #tt-three-stories .tab{font-size:14px;min-height:58px;}
+  #tt-three-stories .metric-label,#tt-three-stories .metric-small,#tt-three-stories .muted.small{font-size:13px;}
+  #tt-three-stories .metric .small,#tt-three-stories .small{font-size:13px;}
+  #tt-three-stories .label,#tt-three-stories .badge{font-size:12px;}
+  #tt-three-stories .visitor-story p,#tt-three-stories .message p{font-size:15px;}
+  #tt-three-stories .service p{font-size:13px;}
+  #tt-three-stories .pilot-notice{padding:9px 24px;border-bottom:1px solid var(--line);font-size:12px;color:var(--muted);text-align:center;background:var(--green-bg);}
+  #tt-three-stories .photo-button{position:relative;display:flex;}
+  #tt-three-stories .file-input{width:100%;}
+  #tt-three-stories .photo-button:focus-within{outline:2px solid var(--accent);}
+  @media(max-width:480px){body{padding:0!important}#tt-three-stories{border-radius:0;min-height:100dvh;border:0;}#tt-three-stories .tab{font-size:12px;min-height:55px;}#tt-three-stories .pilot-notice{padding:8px 14px;}#tt-three-stories .metric-label{font-size:12px!important;}#tt-three-stories .metric .small{font-size:11px;}#tt-three-stories .metric .number{font-size:20px;}#tt-three-stories .service .number{font-size:23px;}}
+</style></head>
+<body>
+<script type="application/json" id="codex-visualization-widget-state">__CODEX_VISUALIZATION_WIDGET_STATE__</script>
+<script>(() => {
+  const root = document.documentElement;
+  const mediaQuery = globalThis.matchMedia("(prefers-color-scheme: dark)");
+  const apply = Reflect.apply;
+  const isArray = Array.isArray;
+  const hasOwn = Object.hasOwn;
+  const parentWindow = globalThis.parent;
+  const stringify = JSON.stringify;
+  const parse = JSON.parse;
+  const encode = TextEncoder.prototype.encode.bind(new TextEncoder());
+  const initialStateElement = document.getElementById(
+    "codex-visualization-widget-state",
+  );
+  const initialGlobals = parse(initialStateElement?.textContent ?? "{}");
+  initialStateElement?.remove();
+  /** @type {Record<string, unknown> | null} */
+  let state = initialGlobals.widgetState ?? null;
+  const statePersistence = initialGlobals.statePersistence ?? "none";
+  let nextStateRequestId = 0;
+  /** @type {Map<number, { resolve: () => void; reject: (error: Error) => void; timeout: ReturnType<typeof globalThis.setTimeout>; serializedState: string }>} */
+  const pendingStateWrites = new Map();
+  const persistenceError = () =>
+    Object.assign(
+      new Error("The host could not persist the widget state update"),
+      {
+        code: -32000,
+        data: { code: "widget_state_persistence_failed", retryable: false },
+      },
+    );
+  /**
+   * @param {object} prototype
+   * @param {string} property
+   */
+  const getPrototypeGetter = (prototype, property) => {
+    // oxlint-disable-next-line typescript/unbound-method -- invoked through captured Reflect.apply
+    const getter = Object.getOwnPropertyDescriptor(prototype, property)?.get;
+    if (getter == null) {
+      throw new Error(`Missing ${property} getter`);
+    }
+    return getter;
+  };
+  const getMessageData = getPrototypeGetter(MessageEvent.prototype, "data");
+  const getMessagePorts = getPrototypeGetter(MessageEvent.prototype, "ports");
+  const getMessageSource = getPrototypeGetter(MessageEvent.prototype, "source");
+  // oxlint-disable-next-line typescript/unbound-method -- captured before the untrusted fragment runs
+  const addHostMessageListener = MessagePort.prototype.addEventListener;
+  // oxlint-disable-next-line typescript/unbound-method -- captured before the untrusted fragment runs
+  const postHostMessage = MessagePort.prototype.postMessage;
+  // oxlint-disable-next-line typescript/unbound-method -- captured before the untrusted fragment runs
+  const startHostPort = MessagePort.prototype.start;
+  // oxlint-disable-next-line typescript/unbound-method -- captured before the untrusted fragment runs
+  const stopMessagePropagation = Event.prototype.stopImmediatePropagation;
+  /** @type {MessagePort | null} */
+  let hostPort = null;
+  const postToHost = (type, payload) => {
+    if (hostPort != null) {
+      apply(postHostMessage, hostPort, [{ type, ...payload }]);
+    }
+  };
+  const openExternal = ({ href }) => {
+    if (globalThis.navigator.userActivation?.isActive === true) {
+      postToHost("open-external", { href });
+    }
+  };
+  const sendFollowUpMessage = ({ context, prompt, title }) => {
+    if (globalThis.navigator.userActivation?.isActive === true) {
+      postToHost("follow-up", { context, prompt, title });
+    }
+    return Promise.resolve();
+  };
+  /**
+   * @param {Record<string, unknown> | ((previous: Record<string, unknown> | null) => Record<string, unknown>)} next
+   * @returns {Promise<void>}
+   */
+  const setWidgetState = async (next) => {
+    const nextState = typeof next === "function" ? next(state) : next;
+    if (
+      nextState == null ||
+      typeof nextState !== "object" ||
+      isArray(nextState)
+    ) {
+      throw new TypeError("Widget state must be a JSON object");
+    }
+    const inputState = stringify(
+      nextState,
+      (_key, /** @type {unknown} */ value) => {
+        if (
+          typeof value === "undefined" ||
+          typeof value === "function" ||
+          typeof value === "symbol" ||
+          (typeof value === "number" && !Number.isFinite(value))
+        ) {
+          throw new TypeError("Widget state must be a JSON object");
+        }
+        return value;
+      },
+    );
+    const parsedState = parse(inputState);
+    if (
+      parsedState == null ||
+      typeof parsedState !== "object" ||
+      isArray(parsedState)
+    ) {
+      throw new TypeError("Widget state must be a JSON object");
+    }
+    const storedState = {
+      modelContent: null,
+      privateContent: null,
+      ...parsedState,
+    };
+    const serializedState = stringify(storedState);
+    if (encode(serializedState).length > 16 * 1024) {
+      throw new TypeError(
+        "Widget state must be a JSON object of at most 16 KiB",
+      );
+    }
+    if (
+      hasOwn(storedState, "imageIds") &&
+      (!isArray(storedState.imageIds) ||
+        storedState.imageIds.some(
+          (/** @type {unknown} */ id) => typeof id !== "string",
+        ))
+    ) {
+      throw new TypeError("Widget state imageIds must be an array of strings");
+    }
+    if (storedState.imageIds?.length > 0) {
+      throw Object.assign(
+        new TypeError("Visualization state does not support image attachments"),
+        { code: -32602, data: { code: "images_unsupported" } },
+      );
+    }
+    state = storedState;
+    globalThis.openai.widgetState = state;
+    globalThis.dispatchEvent(
+      new CustomEvent("openai:set_globals", {
+        detail: { globals: { widgetState: state } },
+      }),
+    );
+    if (statePersistence === "none") {
+      throw persistenceError();
+    }
+    const id = ++nextStateRequestId;
+    return new Promise((resolve, reject) => {
+      const timeout = globalThis.setTimeout(() => {
+        pendingStateWrites.delete(id);
+        reject(persistenceError());
+      }, 30_000);
+      pendingStateWrites.set(id, { resolve, reject, timeout, serializedState });
+      postToHost("widget-state-write", { id, state: serializedState });
+    });
+  };
+  const bindingElement = document.getElementById("codex-visualization-bindings");
+  const mockElement = document.getElementById("codex-connector-mocks");
+  const fileElement = document.getElementById("codex-preview-files");
+  const connectorGlobals = {};
+  if (bindingElement != null || mockElement != null || fileElement != null) {
+    const bindings = parse(bindingElement?.textContent ?? "{}");
+    bindingElement?.remove();
+    const values = new Map();
+    for (const [name, binding] of Object.entries(bindings)) {
+      if (binding.type === "json") values.set(name, structuredClone(binding.value));
+    }
+    const pending = [bindings];
+    while (pending.length) {
+      const object = pending.pop();
+      Object.freeze(object);
+      for (const child of Object.values(object)) {
+        if (child !== null && typeof child === "object") pending.push(child);
+      }
+    }
+    const updates = [];
+    if (mockElement != null) {
+      const mocks = Object.entries(parse(mockElement.textContent));
+      mockElement.remove();
+      for (const [name, value] of mocks) {
+        values.set(name, value);
+        updates.push({ name, revision: 1, state: "ready", value: { type: "json", value } });
+      }
+    }
+    if (fileElement != null) {
+      const files = parse(fileElement.textContent);
+      fileElement.remove();
+      const blobs = new Map();
+      const urls = [];
+      for (const [name, binding] of Object.entries(bindings)) {
+        if (binding.type !== "file" || !hasOwn(files, binding.path)) continue;
+        const file = files[binding.path];
+        let blob = blobs.get(binding.path);
+        if (blob == null) {
+          const bytes = Uint8Array.fromBase64?.(file.base64) ??
+            Uint8Array.from(atob(file.base64), (char) => char.charCodeAt(0));
+          blob = new Blob([bytes], { type: file.mimeType });
+          blobs.set(binding.path, blob);
+        }
+        const url = URL.createObjectURL(blob);
+        urls.push(url);
+        values.set(name, { name: file.name, blob, url });
+        updates.push({ name, revision: 1, state: "ready", value: { type: "file", ...file } });
+      }
+      globalThis.addEventListener("pagehide", (event) => {
+        // A persisted pagehide can restore this same document and its subscriptions.
+        if (event.persisted) return;
+        for (const url of urls) URL.revokeObjectURL(url);
+        urls.length = 0;
+      });
+    }
+    if (mockElement != null || fileElement != null) connectorGlobals.visualizationData = { updates };
+    connectorGlobals.visualization = {
+      get bindings() {
+        return bindings;
+      },
+      /** @param {string} name @param {(value: unknown) => void} callback */
+      onData(name, callback) {
+        if (typeof callback !== "function") {
+          throw new TypeError("onData requires a callback");
+        }
+        try {
+          callback(values.get(name));
+        } catch (error) {
+          // oxlint-disable-next-line no-console -- Keep authored callback failures local.
+          console.error("Live visualization data callback failed", error);
+        }
+        // A static preview delivers the current value once per subscription.
+        return () => {};
+      },
+    };
+  }
+  const syncTheme = () => {
+    const theme = mediaQuery.matches ? "dark" : "light";
+    root.dataset.theme = theme;
+    globalThis.openai = {
+      ...globalThis.openai,
+      ...connectorGlobals,
+      openExternal,
+      sendFollowUpMessage,
+      setWidgetState,
+      theme,
+      visualizationStyleVariables: {},
+      visualizationTheme: theme,
+      widgetState: state,
+      statePersistence,
+      stateModelContext: "none",
+    };
+    globalThis.dispatchEvent(
+      new CustomEvent("openai:set_globals", {
+        detail: { globals: globalThis.openai },
+      }),
+    );
+  };
+  const sendHeight = () => {
+    postToHost("height", {
+      height: Math.ceil(
+        Math.max(
+          document.body.scrollHeight,
+          document.body.getBoundingClientRect().height,
+        ),
+      ),
+    });
+  };
+
+  globalThis.addEventListener(
+    "message",
+    (event) => {
+      const data = apply(getMessageData, event, []);
+      const ports = apply(getMessagePorts, event, []);
+      const source = apply(getMessageSource, event, []);
+      if (
+        hostPort != null ||
+        source !== parentWindow ||
+        typeof data !== "object" ||
+        data?.type !== "codex-visualization-initialize" ||
+        !isArray(ports) ||
+        ports.length !== 1
+      ) {
+        return;
+      }
+      apply(stopMessagePropagation, event, []);
+      const nextHostPort = ports[0];
+      try {
+        apply(addHostMessageListener, nextHostPort, [
+          "message",
+          (event) => {
+            const data = apply(getMessageData, event, []);
+            if (typeof data === "object" && data?.type === "measure") {
+              sendHeight();
+            } else if (
+              typeof data === "object" &&
+              data?.type === "widget-state-result"
+            ) {
+              /** @type {unknown} */
+              const id = data.id;
+              if (typeof id !== "number") {
+                return;
+              }
+              const pending = pendingStateWrites.get(id);
+              if (pending != null) {
+                pendingStateWrites.delete(id);
+                globalThis.clearTimeout(pending.timeout);
+                if (data.ok === true) {
+                  pending.resolve();
+                } else {
+                  pending.reject(persistenceError());
+                }
+              }
+            }
+          },
+        ]);
+        apply(startHostPort, nextHostPort, []);
+      } catch {
+        return;
+      }
+      hostPort = nextHostPort;
+      for (const [id, { serializedState }] of pendingStateWrites) {
+        postToHost("widget-state-write", { id, state: serializedState });
+      }
+      sendHeight();
+    },
+    { capture: true },
+  );
+  document.currentScript?.remove();
+  mediaQuery.addEventListener("change", syncTheme);
+  globalThis.addEventListener("click", (event) => {
+    if (event.defaultPrevented) {
+      return;
+    }
+    let element = null;
+    if (event.target instanceof globalThis.Element) {
+      element = event.target;
+    } else if (event.target instanceof globalThis.Node) {
+      element = event.target.parentElement;
+    }
+    const link = element?.closest("a[href]");
+    const href = link?.getAttribute("href");
+    if (href == null) {
+      return;
+    }
+    if (href.startsWith("#")) {
+      let id;
+      try {
+        id = decodeURIComponent(href.slice(1));
+      } catch {
+        return;
+      }
+      const target = id.length === 0 ? root : document.getElementById(id);
+      if (
+        target == null ||
+        globalThis.navigator.userActivation?.isActive !== true
+      ) {
+        return;
+      }
+      event.preventDefault();
+      postToHost("scroll-to", {
+        top: target.getBoundingClientRect().top + globalThis.scrollY,
+      });
+      return;
+    }
+    event.preventDefault();
+    openExternal({ href });
+  });
+  new ResizeObserver(sendHeight).observe(document.body);
+  syncTheme();
+})();
+</script>
+<div id="tt-three-stories" aria-label="Talking Trees concept demo with interactive physiology and community">
+<style>
+#tt-three-stories{--paper:light-dark(#fffefa,#1c2b27);--base:light-dark(#f8f8f1,#15221e);--ink:light-dark(#1c382b,#edf3e8);--muted:light-dark(#5c6f64,#bfccc1);--line:light-dark(#dce4d8,#41554a);--blue:light-dark(#265f83,#a5d5f1);--blue-bg:light-dark(#e6f1f8,#233f51);--green:light-dark(#326446,#a9d8a6);--green-bg:light-dark(#e7efdf,#2b4535);--amber:light-dark(#895321,#f5c589);--amber-bg:light-dark(#f7ebd5,#493a29);font:14px/1.5 system-ui,sans-serif;background:var(--base);color:var(--ink);border:1px solid var(--line);border-radius:16px;overflow:hidden;max-width:100%}
+#tt-three-stories *{box-sizing:border-box}#tt-three-stories [hidden]{display:none!important}#tt-three-stories h1,#tt-three-stories h2,#tt-three-stories h3,#tt-three-stories p{margin:0}#tt-three-stories button{font:inherit;color:inherit;cursor:inherit;border:0;background:none}#tt-three-stories button:focus-visible,#tt-three-stories summary:focus-visible{outline:2px solid var(--accent);outline-offset:3px}#tt-three-stories header{background:var(--paper);border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;padding:13px 23px;gap:10px}#tt-three-stories .brand{font-size:18px;font-weight:700;letter-spacing:-.5px;display:flex;align-items:center;gap:8px;color:var(--green)}#tt-three-stories .label{font-size:11px;letter-spacing:.12em;text-transform:uppercase;font-weight:700;color:var(--accent,var(--green))}#tt-three-stories .muted{color:var(--muted)}#tt-three-stories .small{font-size:12px}#tt-three-stories .hero{display:grid;grid-template-columns:1fr 132px;align-items:center;gap:20px;padding:22px 24px 18px}#tt-three-stories h1{font:500 36px/1.05 Georgia,serif;letter-spacing:-.9px;margin:5px 0 9px}#tt-three-stories .tree{width:132px;aspect-ratio:1;border-radius:49% 46% 45% 51%;background:var(--green-bg);color:var(--green);display:grid;place-items:center}#tt-three-stories .tree svg{width:76px;height:76px;stroke-width:1.2}#tt-three-stories .tabs{padding:0 24px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}#tt-three-stories .tab{min-width:0;display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-start;gap:4px;border:1px solid transparent;border-radius:10px 10px 0 0;padding:10px 12px 12px;text-align:left;font-weight:650;background:var(--tint);color:var(--accent);position:relative}#tt-three-stories .tab[aria-selected=true]:after{content:'';position:absolute;bottom:0;left:0;right:0;height:4px;background:var(--accent)}#tt-three-stories .tab[aria-selected=false]{opacity:.84}#tt-three-stories .tab svg{width:19px;height:19px}#tt-three-stories .live{--accent:var(--blue);--tint:var(--blue-bg)}#tt-three-stories .value{--accent:var(--green);--tint:var(--green-bg)}#tt-three-stories .life{--accent:var(--amber);--tint:var(--amber-bg)}#tt-three-stories .panel{padding:20px 24px 24px;border-top:1px solid var(--line);background:var(--paper);display:grid;gap:15px}#tt-three-stories .intro{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap}#tt-three-stories h2{font:500 25px/1.16 Georgia,serif;letter-spacing:-.4px;margin:3px 0 5px}#tt-three-stories .badge{display:inline-flex;padding:4px 8px;align-items:center;border-radius:20px;font-size:11px;font-weight:600;background:var(--tint);color:var(--accent);white-space:nowrap}#tt-three-stories .metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}#tt-three-stories .metric{border:1px solid var(--line);border-radius:10px;text-align:left;padding:11px;display:grid;gap:2px;min-width:0}#tt-three-stories .metric[aria-pressed=true]{background:var(--tint);border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}#tt-three-stories .metric .number,#tt-three-stories .number{font:500 26px/1.15 Georgia,serif;white-space:nowrap;color:var(--accent)}#tt-three-stories .unit{font:400 12px/1.2 system-ui,sans-serif;white-space:normal}#tt-three-stories .metric .metric-label{font-size:12px;font-weight:600;line-height:1.25}#tt-three-stories .metric .small{font-size:11px}#tt-three-stories .message{background:var(--tint);border-radius:11px;padding:15px 17px;display:grid;gap:5px}#tt-three-stories .message h3{font:500 21px/1.2 Georgia,serif}#tt-three-stories .chart{border:1px solid var(--line);border-radius:11px;padding:13px;display:grid;gap:10px}#tt-three-stories .chart-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}#tt-three-stories .chart-head h3{font-size:15px;font-weight:650}#tt-three-stories .switch{border:1px solid var(--line);border-radius:7px;display:flex;overflow:hidden}#tt-three-stories .switch button{font-size:12px;padding:7px 12px}#tt-three-stories .switch button[aria-pressed=true]{background:var(--tint);font-weight:650;color:var(--accent)}#tt-three-stories .plot{width:100%;height:auto;display:block}#tt-three-stories .plot text{font:11px system-ui,sans-serif;fill:var(--muted)}#tt-three-stories .feature{padding:18px 19px;background:var(--tint);border-radius:12px;display:grid;gap:10px}#tt-three-stories .feature h3{font:500 22px/1.25 Georgia,serif}#tt-three-stories .carbon{font:500 48px/1.05 Georgia,serif;color:var(--accent);letter-spacing:-1.4px}#tt-three-stories .carbon small{font-size:22px;letter-spacing:0}#tt-three-stories .value-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}#tt-three-stories .service{border:1px solid var(--line);border-radius:10px;padding:12px;display:grid;align-content:start;gap:6px;min-width:0}#tt-three-stories .service h3{font-size:13px;font-weight:650;display:flex;align-items:center;gap:6px}#tt-three-stories .service svg{width:17px;height:17px;color:var(--accent)}#tt-three-stories .service p{font-size:12px;color:var(--muted)}#tt-three-stories .fact-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}#tt-three-stories .fact{border-bottom:1px solid var(--line);padding:6px 3px 11px}#tt-three-stories .fact strong{display:block;font-size:18px;font-weight:600;color:var(--accent)}#tt-three-stories .seasons{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}#tt-three-stories .season{border-radius:8px;border:1px solid var(--line);padding:9px 5px;display:grid;justify-items:center;gap:4px;font-size:12px;text-align:center}#tt-three-stories .season[aria-pressed=true]{border-color:var(--accent);background:var(--tint);font-weight:650}#tt-three-stories .season svg{width:21px;height:21px;color:var(--accent)}#tt-three-stories details{padding:10px 0 0;border-top:1px solid var(--line)}#tt-three-stories summary{font-weight:650;color:var(--accent);cursor:inherit}#tt-three-stories details p{margin:6px 0 0;color:var(--muted)}#tt-three-stories footer{font-size:11px;color:var(--muted);text-align:center;padding:12px 20px;border-top:1px solid var(--line);background:var(--base)}
+@media(max-width:480px){#tt-three-stories header{padding:12px 14px}#tt-three-stories .hero{grid-template-columns:1fr 78px;padding:17px 14px 14px;gap:10px}#tt-three-stories h1{font-size:29px}#tt-three-stories .tree{width:78px}#tt-three-stories .tree svg{width:47px;height:47px}#tt-three-stories .tabs{padding:0 10px;gap:4px}#tt-three-stories .tab{padding:9px 7px 11px;font-size:12px;line-height:1.25}#tt-three-stories .panel{padding:15px 13px 20px;gap:12px}#tt-three-stories .metrics{gap:5px}#tt-three-stories .metric{padding:8px 6px}#tt-three-stories .metric .number{font-size:21px}#tt-three-stories .metric .metric-label{font-size:11px}#tt-three-stories .unit{font-size:10px}#tt-three-stories .value-grid{gap:7px}#tt-three-stories .service{padding:9px}#tt-three-stories .carbon{font-size:39px}#tt-three-stories .carbon small{font-size:18px}}
+</style>
+<style>
+#tt-three-stories{--purple:light-dark(#74508b,#e0c1f4);--purple-bg:light-dark(#f0e8f5,#46344f)}#tt-three-stories .tabs{grid-template-columns:repeat(4,minmax(0,1fr))}#tt-three-stories .survey{--accent:var(--purple);--tint:var(--purple-bg)}#tt-three-stories .survey-form{display:grid;gap:17px}#tt-three-stories .survey-form fieldset{padding:0;margin:0;border:0;min-width:0}#tt-three-stories .survey-form legend{font-weight:650;margin:0 0 8px}#tt-three-stories .answers{display:grid;gap:5px}#tt-three-stories .answers label{padding:8px 10px;border:1px solid var(--line);border-radius:8px;display:flex;gap:8px;align-items:center;min-height:40px}#tt-three-stories .answers input{accent-color:var(--accent);flex:none}#tt-three-stories .answers label:has(input:checked){background:var(--tint);border-color:var(--accent)}#tt-three-stories .submit{background:var(--accent);color:var(--paper);font-weight:650;border-radius:9px;min-height:44px;padding:10px 20px;justify-self:start}#tt-three-stories .submit:disabled{opacity:.5}#tt-three-stories .survey-note{font-size:12px;color:var(--muted)}#tt-three-stories .confirm{display:grid;gap:10px;text-align:center;justify-items:center;background:var(--tint);border-radius:12px;padding:25px 18px}#tt-three-stories .confirm svg{width:34px;height:34px;color:var(--accent)}#tt-three-stories .confirm button{border:1px solid var(--accent);border-radius:8px;padding:7px 12px;color:var(--accent)}@media(max-width:480px){#tt-three-stories .tab{font-size:11px;padding:9px 5px 11px}#tt-three-stories .tab i{min-height:15px}}
+</style>
+<style>
+#tt-three-stories .community-card{display:grid;gap:12px;border:1px solid var(--line);border-radius:12px;padding:15px}
+#tt-three-stories .community-card h3,#tt-three-stories .community-feed h3{font:500 22px/1.2 Georgia,serif}
+#tt-three-stories .community-form{display:grid;gap:9px}
+#tt-three-stories .community-form>label:not(.photo-button):not(.consent){font-size:13px;font-weight:650}
+#tt-three-stories textarea{display:block;resize:vertical;background:var(--paper);color:var(--ink);border:1px solid var(--line);border-radius:8px;font:inherit;padding:11px;width:100%;min-height:90px}
+#tt-three-stories .count{text-align:right;margin-top:-7px}
+#tt-three-stories .photo-button{display:flex;align-items:center;gap:10px;justify-content:flex-start;background:var(--tint);color:var(--accent);border:1px dashed var(--accent);border-radius:8px;padding:11px;min-height:48px;cursor:inherit;font-weight:650}
+#tt-three-stories .photo-button small{display:block;font-size:11px;font-weight:400}
+#tt-three-stories .photo-button svg{width:22px;height:22px}
+#tt-three-stories .file-input{font-size:12px;max-width:100%;color:var(--muted)}
+#tt-three-stories .photo-preview{display:grid;grid-template-columns:80px minmax(0,1fr);gap:10px;align-items:center;padding:8px;border:1px solid var(--line);border-radius:8px}
+#tt-three-stories .photo-preview img{width:80px;height:70px;object-fit:cover;border-radius:5px;background:var(--tint)}
+#tt-three-stories .photo-preview p{overflow-wrap:anywhere;font-size:12px}
+#tt-three-stories .photo-preview button,#tt-three-stories .confirmation-inline button{color:var(--accent);font-weight:650;font-size:12px;text-decoration:underline;padding:6px 0}
+#tt-three-stories .consent{display:flex;gap:8px;align-items:flex-start;font-size:12px;line-height:1.4}
+#tt-three-stories .consent input{accent-color:var(--accent);flex:none;margin-top:3px}
+#tt-three-stories .community-feed{display:grid;gap:12px}
+#tt-three-stories .visitor-story{display:grid;grid-template-columns:35px minmax(0,1fr);gap:10px;align-items:flex-start;border-bottom:1px solid var(--line);padding:0 0 12px}
+#tt-three-stories .avatar{border-radius:50%;width:35px;height:35px;display:grid;place-items:center;color:var(--accent);background:var(--tint)}
+#tt-three-stories .avatar svg{width:18px;height:18px}
+#tt-three-stories .story-meta{font-size:12px;font-weight:650;margin-bottom:4px}
+#tt-three-stories .story-meta span{font-weight:400;color:var(--muted)}
+#tt-three-stories .confirmation-inline{display:grid;grid-template-columns:28px 1fr;gap:11px;padding:13px;background:var(--tint);border-radius:9px;color:var(--accent)}
+#tt-three-stories .confirmation-inline h3{font:500 20px Georgia,serif}
+#tt-three-stories [role=alert]{color:var(--accent)}
+</style><style id="tt-climate-education-style">
+#tt-three-stories .metric-group{display:grid;gap:7px;min-width:0}
+#tt-three-stories .section-kicker{font-weight:650;font-size:14px;display:flex;align-items:center;gap:7px;color:var(--accent)}
+#tt-three-stories .section-kicker svg{width:18px;height:18px}
+#tt-three-stories .metric-group .metrics{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+#tt-three-stories .weather-group{border-top:1px solid var(--line);padding-top:13px}
+#tt-three-stories .weather-group .metric{padding:9px 11px;gap:3px}
+#tt-three-stories .weather-group .number{font-size:23px}
+#tt-three-stories .learning-note{border:1px solid var(--line);border-radius:10px;padding:12px 14px;display:grid;gap:7px}
+#tt-three-stories .learning-note h3{font-size:16px;font-weight:650}
+#tt-three-stories .learning-note p{font-size:14px;line-height:1.5}
+#tt-three-stories .learning-note .learn-source{color:var(--muted);font-size:12px}
+#tt-three-stories .learn-rule{height:1px;background:var(--line);margin:3px 0}
+#tt-three-stories .climate-compare{display:grid;gap:11px;border:1px solid var(--line);border-radius:11px;padding:14px;}
+#tt-three-stories .climate-compare h3{font:500 23px/1.15 Georgia,serif}
+#tt-three-stories .compare-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+#tt-three-stories .compare-place{border-radius:9px;padding:10px 11px;display:grid;gap:3px;background:var(--green-bg);color:var(--green)}
+#tt-three-stories .compare-place.open{background:var(--amber-bg);color:var(--amber)}
+#tt-three-stories .compare-place strong{font-size:14px;font-weight:650}
+#tt-three-stories .compare-temperature{font:500 33px/1.1 Georgia,serif;}
+#tt-three-stories .compare-place .compare-rh{font-size:13px;}
+#tt-three-stories .delta{font:500 24px/1.2 Georgia,serif;color:var(--green)}
+#tt-three-stories .climate-link{display:grid;gap:5px;background:var(--tint);padding:14px;border-radius:10px}
+#tt-three-stories .climate-link h3{font:500 20px/1.2 Georgia,serif}
+#tt-three-stories .climate-link p{font-size:14px}
+#tt-three-stories .measurement-kind{color:var(--accent);font-size:11px;font-weight:650;letter-spacing:.015em}
+</style>
+<style id="tt-compact-layout-style">
+/* Single selected topic and a compact, persistent navigation rail. */
+#tt-three-stories{max-width:690px!important;overflow:clip;}
+#tt-three-stories .panel{gap:12px;padding:17px 19px 22px;min-width:0;}
+#tt-three-stories .intro{gap:6px;}
+#tt-three-stories .detail-layout{display:grid;grid-template-columns:minmax(0,158px) minmax(0,1fr);gap:15px;align-items:start;min-width:0;}
+#tt-three-stories .detail-rail{display:grid;gap:11px;align-self:start;position:sticky;top:12px;min-width:0;}
+#tt-three-stories .detail-pane{display:grid;gap:10px;min-width:0;}
+#tt-three-stories .detail-pane>section,#tt-three-stories .detail-pane>div{min-width:0;}
+#tt-three-stories .detail-rail .metric-group{gap:5px;}
+#tt-three-stories .detail-rail .section-kicker{font-size:12px;line-height:1.3;}
+#tt-three-stories .detail-rail .section-kicker svg{width:15px;height:15px;flex:none;}
+#tt-three-stories .detail-rail .metrics{grid-template-columns:1fr;gap:5px;}
+#tt-three-stories .detail-rail .metric{padding:6px 9px;gap:2px;border-radius:7px;}
+#tt-three-stories .detail-rail .metric .metric-label{font-size:13px;line-height:1.2;}
+#tt-three-stories .detail-rail .metric .number{font-size:23px;line-height:1.06;}
+#tt-three-stories .detail-rail .metric .unit{font-size:11px;}
+#tt-three-stories .detail-rail .metric .small,#tt-three-stories .detail-rail .measurement-kind{display:none;}
+#tt-three-stories .detail-rail .weather-group{padding-top:7px;}
+#tt-three-stories .detail-rail .weather-group>p{display:none;}
+#tt-three-stories .topic-list{display:grid;gap:5px;}
+#tt-three-stories .topic-choice{text-align:left;font-size:14px;line-height:1.22;padding:9px 10px;min-height:46px;border:1px solid var(--line);border-radius:8px;display:grid;gap:3px;min-width:0;}
+#tt-three-stories .topic-choice strong{font-weight:650;font-size:13px;}
+#tt-three-stories .topic-choice small{font-size:12px;color:var(--muted);}
+#tt-three-stories .topic-choice[aria-pressed=true]{background:var(--tint);color:var(--accent);border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent);}
+#tt-three-stories .topic-choice[aria-pressed=true] small{color:var(--accent);}
+#tt-three-stories .mobile-topic-picker{display:none;}
+#tt-three-stories .selected-topic{display:grid;gap:10px;min-width:0;}
+#tt-three-stories .selected-topic .service{padding:13px 14px;border:1px solid var(--line);gap:8px;}
+#tt-three-stories .selected-topic .service h3{font-size:16px;}
+#tt-three-stories .selected-topic .service .number{font-size:29px;white-space:normal;}
+#tt-three-stories .selected-topic .service p{font-size:14px;line-height:1.5;}
+#tt-three-stories .selected-topic .feature{padding:15px;}
+#tt-three-stories .selected-topic .feature .carbon{font-size:40px;line-height:1.15;}
+#tt-three-stories .selected-topic .feature .carbon small{font-size:19px;}
+#tt-three-stories .selected-topic .climate-compare{padding:12px;gap:9px;}
+#tt-three-stories .selected-topic .compare-place{padding:9px;}
+#tt-three-stories .selected-topic .compare-place strong{font-size:13px;}
+#tt-three-stories .selected-topic .compare-temperature{font-size:28px;}
+#tt-three-stories .selected-topic .compare-rh{font-size:12px;}
+#tt-three-stories .parameter-visuals{display:grid;gap:7px;min-width:0;}
+#tt-three-stories .visual-tab-switch{display:flex;justify-content:space-between;align-items:center;gap:6px;flex-wrap:wrap;}
+#tt-three-stories .visual-tab-switch .switch{flex:1;min-width:0;}
+#tt-three-stories .visual-tab-switch .switch button{flex:1;padding:8px 5px;min-height:38px;white-space:nowrap;}
+#tt-three-stories .visual-tab-switch .switch button[aria-pressed=true]{background:var(--tint);color:var(--accent);}
+#tt-three-stories .detail-pane .message{padding:12px 13px;gap:5px;}
+#tt-three-stories .detail-pane .message h3{font-size:20px;}
+#tt-three-stories .detail-pane .learning-note{padding:11px 12px;gap:5px;}
+#tt-three-stories .detail-pane .learning-note p{font-size:14px;line-height:1.46;}
+#tt-three-stories .detail-pane .learning-note .learn-source{font-size:12px;}
+#tt-three-stories .detail-pane .learning-note h3{font-size:15px;}
+#tt-three-stories .detail-pane .chart{gap:7px;padding:10px;}
+#tt-three-stories .detail-pane .chart-head h3{font-size:15px;}
+#tt-three-stories .detail-pane .chart-head .switch button{padding:6px 9px;}
+#tt-three-stories .detail-pane .chart .plot{max-width:370px;}
+#tt-three-stories .detail-pane #tt-schematic-drafts{padding:10px;gap:7px;}
+#tt-three-stories .detail-pane .anatomy-header{display:none;}
+#tt-three-stories .detail-pane .anatomy-toolbar{justify-content:space-between;gap:5px;}
+#tt-three-stories .detail-pane .anatomy-toolbar .switch button{padding:6px 7px;font-size:11px;}
+#tt-three-stories .detail-pane .anatomy-toolbar .motion-button{padding:6px 8px;font-size:11px;}
+#tt-three-stories .detail-pane #tt-schematic-drafts .legend{gap:5px 9px;}
+#tt-three-stories .detail-pane #tt-schematic-drafts .legend .key{font-size:10px;}
+#tt-three-stories .detail-pane #tt-schematic-drafts .visual{max-width:280px!important;}
+#tt-three-stories .community-card{padding:12px;gap:9px;}
+#tt-three-stories .community-card .photo-button{padding:9px;}
+#tt-three-stories .selected-topic .community-feed{gap:9px;}
+#tt-three-stories .selected-topic .survey-form{gap:10px;}
+#tt-three-stories .selected-topic .survey-form .answers label{padding:7px 9px;min-height:38px;}
+@media(min-width:481px) and (max-width:570px){#tt-three-stories .panel{padding:14px 13px 17px;}#tt-three-stories .detail-layout{grid-template-columns:minmax(0,135px) minmax(0,1fr);gap:9px;}#tt-three-stories .detail-rail .metric .number{font-size:21px;}#tt-three-stories .selected-topic .compare-grid{grid-template-columns:1fr;}}
+@media(max-width:480px){#tt-three-stories .panel{padding:12px;}#tt-three-stories .detail-layout{grid-template-columns:1fr;gap:9px;}#tt-three-stories .detail-rail{display:none;}#tt-three-stories .mobile-topic-picker{display:grid;gap:4px;position:sticky;top:0;background:var(--paper);border-bottom:1px solid var(--line);padding:6px 0 10px;z-index:3;}#tt-three-stories .mobile-topic-picker label{font-size:12px;font-weight:650;color:var(--accent);}#tt-three-stories .mobile-topic-picker select{width:100%;min-width:0;min-height:43px;font:inherit;font-size:16px;color:var(--ink);border:1px solid var(--accent);border-radius:8px;background:var(--tint);padding:7px 9px;}#tt-three-stories .detail-pane .visual-tab-switch{flex-wrap:nowrap;}#tt-three-stories .detail-pane .learning-note{padding:11px 12px;}#tt-three-stories .detail-pane #tt-schematic-drafts .visual{max-width:270px!important;}}
+</style>
+<header><div class="brand"><i data-lucide="sprout" aria-hidden="true"></i> Talking Trees</div><span class="label">TSF 2027 · Concept demo</span></header>
+<div class="pilot-notice">Proposed Cornell campus pilot · Illustrative readings · No real submissions</div>
+<section class="hero"><div><div class="label">Meet your tree</div><h1>Hi, I'm a red oak.</h1><p class="muted">I can't talk, but my sensors and my life story can tell you how I experience the world — and how I help it.</p><p class="small muted" style="margin-top:8px"><em>Quercus rubra</em> · Example campus tree</p></div><div class="tree" aria-hidden="true"><i data-lucide="tree-deciduous"></i></div></section>
+<div class="tabs" role="tablist" aria-label="Explore my stories">
+<button type="button" class="tab live" id="tt-live-tab" role="tab" aria-controls="tt-live" aria-selected="true"><i data-lucide="activity" aria-hidden="true"></i> My day</button>
+<button type="button" class="tab value" id="tt-value-tab" role="tab" aria-controls="tt-value" aria-selected="false"><i data-lucide="leaf" aria-hidden="true"></i> My value</button>
+<button type="button" class="tab life" id="tt-life-tab" role="tab" aria-controls="tt-life" aria-selected="false"><i data-lucide="book-open" aria-hidden="true"></i> My life story</button>
+<button type="button" class="tab survey" id="tt-survey-tab" role="tab" aria-controls="tt-survey" aria-selected="false"><i data-lucide="message-circle" aria-hidden="true"></i> Our community</button>
+</div>
+<section id="tt-live" class="panel live" role="tabpanel" aria-labelledby="tt-live-tab">
+  <div class="intro"><div><div class="label">Climate adaptation · Tree physiology</div><h2>How the environment affects me</h2><p class="muted small">Explore how heat, air dryness and water availability influence my daily life.</p></div><span class="badge">Illustrative · 3:00 pm</span></div>
+<div class="mobile-topic-picker"><label for="tt-mobile-day">Choose a parameter</label><select id="tt-mobile-day" data-mobile-group="day"><option value="vpd">Air dryness · 2.3 kPa</option><option value="soil">Soil moisture · 23%</option><option value="sap" selected>Water flow · 18 cm/h</option><option value="stem">Trunk change · −45 µm</option><option value="light">Sunlight · 520 W/m²</option><option value="rain">Rainfall · 4.2 mm</option></select></div><div class="detail-layout"><aside class="detail-rail" aria-label="Choose a measurement">  <section class="metric-group" aria-label="Environmental drivers"><div class="section-kicker"><i data-lucide="cloud-sun" aria-hidden="true"></i> What I'm experiencing</div><div class="metrics" aria-label="Environmental measurements">
+    <button class="metric" data-m="vpd" aria-pressed="false"><span class="metric-label">Air dryness</span><span class="number">2.3 <span class="unit">kPa</span></span><span class="small muted">Vapor pressure deficit</span><span class="measurement-kind">Calculated · Open air</span></button>
+    <button class="metric" data-m="soil" aria-pressed="false"><span class="metric-label">Soil moisture</span><span class="number">23<span class="unit">%</span></span><span class="small muted">Water in the root zone</span><span class="measurement-kind">Local sensor</span></button>
+  </div></section>
+  <section class="metric-group" aria-label="Tree physiological responses"><div class="section-kicker"><i data-lucide="tree-deciduous" aria-hidden="true"></i> How I'm responding</div><div class="metrics" aria-label="Tree measurements">
+    <button class="metric" data-m="sap" aria-pressed="true"><span class="metric-label">Water flow</span><span class="number">18 <span class="unit">cm/h</span></span><span class="small muted">Sap velocity</span><span class="measurement-kind">Local sensor</span></button>
+    <button class="metric" data-m="stem" aria-pressed="false"><span class="metric-label">Trunk change</span><span class="number">−45 <span class="unit">µm</span></span><span class="small muted">Diameter since midnight</span><span class="measurement-kind">Local sensor</span></button>
+  </div></section>
+  <section class="metric-group weather-group" aria-label="Nearby weather context"><div class="section-kicker"><i data-lucide="cloud-rain" aria-hidden="true"></i> Weather around me</div><p class="small muted">Proposed hourly observations from a nearby Cornell weather station, not additional sensors on the tree.</p><div class="metrics" aria-label="Weather station parameters">
+    <button class="metric" data-m="light" aria-pressed="false"><span class="metric-label">Sunlight</span><span class="number">520 <span class="unit">W/m²</span></span><span class="small muted">Solar radiation</span><span class="measurement-kind">Weather station</span></button>
+    <button class="metric" data-m="rain" aria-pressed="false"><span class="metric-label">Rainfall</span><span class="number">4.2 <span class="unit">mm</span></span><span class="small muted">Today so far</span><span class="measurement-kind">Weather station</span></button>
+  </div></section>
+</aside><div class="detail-pane">  <div class="message" aria-live="polite"><div class="label">A message from me</div><h3 id="tt-story-title">I'm moving water up to my leaves.</h3><p id="tt-story-text">On a sunny afternoon, water moves up through my trunk to replace some of the water lost from my leaves.</p></div>
+<section class="learning-note" aria-live="polite" aria-label="Understand the selected measurement"><div class="label">Understand my science</div><h3>What does this measurement mean?</h3><p id="tt-edu-what">Sap velocity tells us how quickly water travels through the water-conducting tissue (xylem) in my trunk.</p><p id="tt-edu-source" class="learn-source">Source: local sap flow sensor · point measurement</p><div class="learn-rule"></div><h3>Why does this matter for sustainability?</h3><p id="tt-edu-why">Transpiration helps cool leaves and the surrounding air. Heat and drought can change water transport, and healthy roots help sustain this service.</p><p id="tt-edu-action" class="small muted">Landscape lesson: protect my roots and soil so I can continue to take up water.</p></section>
+<div class="parameter-visuals"><div class="visual-tab-switch"><div class="switch" aria-label="View selected parameter"><button type="button" data-detail-visual="schematic" aria-pressed="true">Inside me</button><button type="button" data-detail-visual="chart" aria-pressed="false">Data graph</button></div></div><div id="tt-view-schematic"><div id="tt-schematic-drafts">
+<style>
+#tt-schematic-drafts{--leaf:#5f9564;--leaf-light:#92ba7b;--wood:#996d48;--soil:light-dark(#eee4d1,#483a2c);--water:light-dark(#287ba4,#87c7ef);--heat:light-dark(#a65b32,#f1b27e);--sun:light-dark(#a5791b,#ffd77a);--edge:var(--line);display:grid;gap:14px;color:var(--ink)}
+#tt-schematic-drafts [hidden]{display:none!important}#tt-schematic-drafts .picker{display:grid;gap:5px;max-width:310px}#tt-schematic-drafts .comparison{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:start}#tt-schematic-drafts .draft{display:grid;gap:8px;min-width:0}#tt-schematic-drafts .draft h3{font-weight:500}#tt-schematic-drafts .visual{display:block;width:100%;height:auto;border-radius:8px;background:var(--paper)}#tt-schematic-drafts svg text{font-family:system-ui,sans-serif;fill:var(--ink);font-size:12px}#tt-schematic-drafts .flow{fill:none;stroke:var(--water);stroke-width:3.4;stroke-linecap:round;stroke-linejoin:round;marker-end:url(#tt-blue-arrow)}#tt-schematic-drafts .heatflow{fill:none;stroke:var(--heat);stroke-width:3;stroke-linecap:round;marker-end:url(#tt-red-arrow)}#tt-schematic-drafts .lightflow{fill:none;stroke:var(--sun);stroke-width:3;stroke-linecap:round;marker-end:url(#tt-gold-arrow)}#tt-schematic-drafts .callout{stroke:var(--muted);stroke-width:1.2;fill:none;stroke-dasharray:3 3}#tt-schematic-drafts .caption{font-size:14px;line-height:1.45}#tt-schematic-drafts .tag{color:var(--muted);font-size:12px}#tt-schematic-drafts .focusline{stroke:var(--water);stroke-width:2;fill:none;stroke-dasharray:5 4}#tt-schematic-drafts .number{font-size:12px;font-weight:600}#tt-schematic-drafts .explain{display:grid;gap:4px}#tt-schematic-drafts .legend{display:flex;gap:12px;flex-wrap:wrap;align-items:center}#tt-schematic-drafts .key{display:inline-flex;align-items:center;gap:5px;font-size:12px;color:var(--muted)}#tt-schematic-drafts .line-key{width:18px;height:3px;display:inline-block;border-radius:2px}#tt-schematic-drafts .sensor-key{width:12px;height:12px;border:2px dashed var(--muted);border-radius:3px;display:inline-block}#tt-schematic-drafts .subtle{color:var(--muted);font-size:12px}#tt-schematic-drafts .detail-title{font-weight:500;font-size:15px}#tt-schematic-drafts .controls{display:flex;align-items:end;gap:12px;flex-wrap:wrap}#tt-schematic-drafts .mode{font-size:12px;color:var(--muted);padding-bottom:8px}@media(max-width:570px){#tt-schematic-drafts .comparison{grid-template-columns:1fr;gap:18px}#tt-schematic-drafts .visual{max-width:360px;justify-self:center}}
+</style><style>
+#tt-three-stories #tt-schematic-drafts{border:1px solid var(--line);border-radius:11px;padding:14px;gap:10px;background:var(--paper)}
+#tt-three-stories .anatomy-header{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap}
+#tt-three-stories .anatomy-header h3{font-size:16px;font-weight:650}
+#tt-three-stories .anatomy-toolbar{display:flex;gap:8px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+#tt-schematic-drafts .motion-button{background:var(--blue);border:0;border-radius:8px;color:var(--paper);font-size:12px;padding:8px 12px;min-height:36px;display:flex;align-items:center;gap:5px;font-weight:650}
+#tt-schematic-drafts .motion-button svg{width:14px;height:14px}
+#tt-three-stories #tt-schematic-drafts .mode{padding:0;font-size:11px;color:var(--muted)}
+#tt-three-stories #tt-schematic-drafts .comparison{grid-template-columns:1fr;gap:0}
+#tt-three-stories #tt-schematic-drafts .draft{justify-items:center;gap:7px}
+#tt-three-stories #tt-schematic-drafts .visual{max-width:340px;height:auto;overflow:visible}
+#tt-three-stories #tt-schematic-drafts .caption{font-size:13px;text-align:center;max-width:440px}
+#tt-three-stories #tt-schematic-drafts .legend{gap:7px 12px;justify-content:center}
+#tt-three-stories #tt-schematic-drafts .key{font-size:11px}
+@media(max-width:480px){#tt-three-stories #tt-schematic-drafts{padding:11px}#tt-three-stories #tt-schematic-drafts .visual{max-width:290px}}
+</style>
+<div class="anatomy-header"><div><div class="label">Look inside me</div><h3>See the process in action</h3></div><span class="badge">Conceptual animation</span></div><select id="tt-param" hidden aria-label="Selected metric"><option value="sap">Sap flow</option><option value="stem">Stem diameter change</option><option value="soil">Soil moisture</option><option value="vpd">Vapor pressure deficit</option><option value="light">Solar radiation</option><option value="rain">Rainfall</option></select><div class="anatomy-toolbar"><div class="switch" aria-label="Illustration view"><button data-anatomy="whole" aria-pressed="true" type="button">Whole tree</button><button data-anatomy="detail" aria-pressed="false" type="button">Zoom inside me</button></div><button type="button" class="motion-button" id="tt-motion-play"><span>Pause animation</span></button></div><span class="mode" id="tt-motion-state" aria-live="polite">Conceptual process</span>
+<div class="comparison">
+<section class="draft" data-anatomy-view="whole">
+<svg class="visual" viewBox="0 0 320 300" role="img" id="tt-tree-diagram" aria-label="Whole tree overview showing water movement from roots toward leaves">
+<defs><marker id="tt-blue-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5 0 10Z" fill="var(--water)"/></marker><marker id="tt-red-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5 0 10Z" fill="var(--heat)"/></marker><marker id="tt-gold-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5 0 10Z" fill="var(--sun)"/></marker></defs>
+<rect x="0" y="223" width="320" height="77" fill="var(--soil)" opacity=".78"/><path d="M0 223H320" stroke="var(--wood)" opacity=".48" stroke-width="1.5"/>
+<g fill="none" stroke="var(--wood)" stroke-linecap="round"><path d="M160 220C124 238 104 259 52 265M161 220C182 241 238 240 279 263M161 221C158 250 163 266 180 286M148 231C110 238 75 232 48 244" stroke-width="8"/><path d="M91 257L75 283M116 245L107 279M220 245L224 278M253 253L285 245M181 270L207 288M49 265L25 280M48 244L22 238" stroke-width="3"/></g>
+<g fill="#78a56f" opacity=".83"><ellipse cx="111" cy="94" rx="63" ry="49"/><ellipse cx="166" cy="66" rx="72" ry="54"/><ellipse cx="216" cy="105" rx="61" ry="46"/><ellipse cx="155" cy="126" rx="92" ry="42"/></g>
+<g fill="none" stroke="var(--wood)" stroke-linecap="round" stroke-linejoin="round"><path d="M160 224C156 190 163 150 159 109" stroke-width="27"/><path d="M160 169Q140 132 106 115L88 89M160 153Q185 122 218 100M159 139Q159 97 170 66M161 174Q188 151 229 140M136 135L110 135M186 128L194 79" stroke-width="8"/><path d="M159 220L160 116M103 115L72 124M217 100L241 85M170 66L153 43" stroke="#d6a879" stroke-width="3.5" opacity=".7"/></g>
+<g fill="#9dbf83" opacity=".94"><ellipse cx="83" cy="72" rx="36" ry="25"/><ellipse cx="129" cy="43" rx="36" ry="27"/><ellipse cx="185" cy="47" rx="43" ry="28"/><ellipse cx="235" cy="78" rx="38" ry="28"/><ellipse cx="254" cy="119" rx="25" ry="22"/><ellipse cx="89" cy="125" rx="38" ry="27"/><ellipse cx="127" cy="145" rx="31" ry="18"/></g>
+<g id="tt-tree-overlay"></g>
+</svg>
+<p class="caption" id="tt-tree-caption">Water enters my roots, moves through my xylem, and eventually evaporates from my leaves.</p>
+</section>
+<section class="draft" data-anatomy-view="detail" hidden>
+<svg class="visual" id="tt-detail-diagram" viewBox="0 0 320 300" role="img" aria-label="Close-up of xylem and transpiration" style="overflow:visible">
+<defs><marker id="tt-blue-arrow-b" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5 0 10Z" fill="var(--water)"/></marker><marker id="tt-red-arrow-b" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5 0 10Z" fill="var(--heat)"/></marker><marker id="tt-gold-arrow-b" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5 0 10Z" fill="var(--sun)"/></marker></defs><g id="tt-detail-overlay"></g>
+</svg>
+<p class="caption" id="tt-detail-caption">Evaporation from leaves helps generate tension that draws water upward through the water-conducting xylem.</p>
+</section>
+</div>
+<div class="legend"><span class="key"><span class="line-key" style="background:var(--water)"></span>Water / vapor movement</span><span class="key"><span class="line-key" style="background:var(--heat)"></span>Heat / physical change</span><span class="key"><span class="line-key" style="background:var(--sun)"></span>Light</span><span class="key"><span class="sensor-key"></span>Measurement location</span></div>
+<p class="small muted">Conceptual illustration · Motion and magnitudes are not live readings. Weather observations are contextual, not on-tree measurements.</p>
+<script>
+(()=>{const root=document.getElementById('tt-schematic-drafts'),$=s=>root.querySelector(s);const blue='var(--water)',heat='var(--heat)',gold='var(--sun)',leaf='var(--leaf)',light='var(--leaf-light)',wood='var(--wood)',soil='var(--soil)',muted='var(--muted)',ink='var(--ink)';const text=(x,y,s,anchor='start')=>`<text x="${x}" y="${y}" text-anchor="${anchor}">${s}</text>`;const path=(d,c=blue,b=false,width=3.2,arrow=true)=>`<path d="${d}" fill="none" stroke="${c}" stroke-width="${width}" stroke-linecap="round" stroke-linejoin="round" ${arrow?`marker-end="url(#tt-${c===heat?'red':c===gold?'gold':'blue'}-arrow${b?'-b':''})"`:''}/>`;const dot=(x,y,r=3,c=blue)=>`<circle cx="${x}" cy="${y}" r="${r}" fill="${c}"/>`;const sensor=(x,y,w,h)=>`<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="5" class="focusline" stroke="${muted}"/>`;const note=(x,y,tx,ty,label)=>`<path d="M${x} ${y}L${tx} ${ty-4}" class="callout"/>${text(tx,ty,label,tx>x?'start':'end')}`;const sun=(x,y,r=16)=>`<circle cx="${x}" cy="${y}" r="${r}" fill="${gold}" opacity=".82"/>`+Array.from({length:8},(_,i)=>{const a=i*Math.PI/4;return `<path d="M${x+Math.cos(a)*(r+5)} ${y+Math.sin(a)*(r+5)}L${x+Math.cos(a)*(r+14)} ${y+Math.sin(a)*(r+14)}" stroke="${gold}" stroke-width="2.5" stroke-linecap="round"/>`}).join('');const leafdraw=(x=45,y=120)=>`<g transform="translate(${x} ${y})"><path d="M0 48Q15 -37 120 0Q151 82 15 83L0 48Z" fill="${light}" stroke="${leaf}" stroke-width="2"/><path d="M-15 67L122 6M32 47L25 10M52 34L77 65M87 19L105 40" fill="none" stroke="${leaf}" stroke-width="2.8" stroke-linecap="round"/></g>`;const drops=(coords)=>coords.map(([x,y])=>`<path d="M${x} ${y-6}Q${x-8} ${y+3} ${x} ${y+6}Q${x+8} ${y+3} ${x} ${y-6}Z" fill="${blue}" opacity=".65"/>`).join('');const cloud=(x=86,y=46)=>`<g fill="color-mix(in srgb, ${blue} 22%, var(--paper))" stroke="${blue}" stroke-width="1.1"><circle cx="${x}" cy="${y}" r="18"/><circle cx="${x+21}" cy="${y-9}" r="24"/><circle cx="${x+43}" cy="${y}" r="17"/><rect x="${x-16}" y="${y}" width="76" height="17" rx="8" stroke="none"/></g>`;const vapors=(x,y,n=3)=>Array.from({length:n},(_,i)=>path(`M${x+i*24} ${y}Q${x+i*24-7} ${y-18} ${x+i*24+5} ${y-35}`,blue,true,2.4)).join('');const rootzoom=`<rect x="15" y="34" width="290" height="230" rx="8" fill="${soil}"/><path d="M157 42Q167 104 143 141Q114 187 56 242M151 140Q201 164 257 199M144 165L135 242" fill="none" stroke="${wood}" stroke-width="16" stroke-linecap="round"/><path d="M93 207L68 192M125 185L102 154M188 157L211 122M222 184L248 160M137 206L164 225" fill="none" stroke="${wood}" stroke-width="5" stroke-linecap="round"/>`;
+const topFlow=path('M65 259Q123 251 158 224')+path('M246 259Q187 247 162 226')+path('M160 224L160 125')+path('M160 139Q142 105 100 87')+path('M160 135Q190 106 221 87')+path('M108 64Q100 48 103 31')+path('M220 65Q232 48 229 31');
+const D={
+sap:{whole:topFlow+sensor(141,181,38,22)+note(180,191,226,188,'Sap sensor'),detail:`<rect x="91" y="49" width="136" height="215" rx="12" fill="${wood}" opacity=".35"/><rect x="103" y="49" width="38" height="215" rx="8" fill="${blue}" opacity=".23"/><rect x="143" y="49" width="38" height="215" rx="8" fill="${blue}" opacity=".32"/><rect x="183" y="49" width="32" height="215" rx="8" fill="${blue}" opacity=".23"/>${[121,161,199].map(x=>path(`M${x} 246L${x} 75`,blue,true,3.4)).join('')}${leafdraw(117,6)}${path('M165 40Q185 23 189 12',blue,true,2.5)}${text(155,285,'Water-conducting xylem','middle')}${text(240,100,'Water','start')}${text(240,116,'rises','start')}${sensor(89,154,140,33)}`,wc:'Water enters my roots, travels through the trunk, and evaporates from my leaves.',dc:'Evaporation from leaves helps create tension in xylem that pulls water upward.'},
+stem:{whole:sensor(138,173,44,40)+path('M113 194L139 194',heat,false,2.8)+path('M209 194L182 194',heat,false,2.8)+note(183,181,230,158,'Dendrometer'),detail:`<g transform="translate(83 137)"><circle r="54" fill="${wood}" opacity=".8"/><circle r="45" fill="${light}"/><circle r="38" fill="${wood}" opacity=".78"/><circle r="29" fill="${soil}"/><circle r="19" fill="none" stroke="${wood}" opacity=".55"/><circle r="8" fill="${wood}" opacity=".35"/></g><g transform="translate(237 137)"><circle r="54" fill="none" stroke="${muted}" stroke-dasharray="4 4"/><circle r="46" fill="${wood}" opacity=".8"/><circle r="37" fill="${light}"/><circle r="32" fill="${wood}" opacity=".78"/><circle r="25" fill="${soil}"/><circle r="16" fill="none" stroke="${wood}" opacity=".55"/><circle r="7" fill="${wood}" opacity=".35"/></g>${path('M146 137L171 137',heat,true,2.7)}${text(83,63,'Hydrated','middle')}${text(237,63,'Water loss','middle')}${text(83,213,'Larger stem','middle')}${text(237,213,'Smaller stem','middle')}${path('M237 72L237 91',heat,true,2.1)}${path('M302 137L284 137',heat,true,2.1)}${text(160,259,'Change exaggerated for clarity','middle')}`,wc:'A dendrometer tracks tiny stem diameter changes as the trunk loses or regains water.',dc:'Water-related changes are reversible. Comparing outer diameters across time can distinguish swelling and shrinking from sustained growth.'},
+soil:{whole:drops([[50,247],[73,276],[116,261],[194,273],[249,243],[272,272]])+path('M68 272L100 260')+path('M236 264L220 246')+sensor(260,242,28,34)+note(260,243,224,231,'Soil probe'),detail:rootzoom+drops([[32,93],[80,87],[105,134],[65,170],[44,211],[196,81],[269,104],[274,237],[182,242],[103,256]])+path('M58 170L88 180',blue,true,3)+path('M270 160L249 180',blue,true,3)+path('M100 242L118 210',blue,true,3)+path('M189 245L164 219',blue,true,3)+`<rect x="258" y="66" width="13" height="78" rx="4" fill="${muted}"/><path d="M264 66V48" stroke="${muted}" stroke-width="2"/>${text(229,57,'Probe')}${text(160,282,'Water close to roots','middle')}`,wc:'Water in soil is a source for my roots. A soil probe reports moisture at one point.',dc:'Roots can draw water from moist soil; their access depends on local soil and root conditions.'},
+air:{whole:sun(275,32,13)+path('M262 53L239 75',heat,false,2.5)+path('M289 86Q266 112 246 114',heat,false,2.5)+sensor(266,124,23,35)+note(268,141,249,174,'Air sensor'),detail:leafdraw(63,118)+sun(250,48,20)+path('M237 75L204 117',heat,true,3)+path('M291 124Q263 159 231 167',heat,true,3)+path('M32 103Q54 84 84 98',heat,true,3)+`<rect x="38" y="50" width="13" height="69" rx="6" fill="none" stroke="${heat}" stroke-width="3"/><circle cx="44.5" cy="119" r="9" fill="${heat}"/><path d="M44.5 91V117" stroke="${heat}" stroke-width="6"/>${text(65,66,'Air temperature')}${text(160,250,'Heat exchange with my canopy','middle')}`,wc:'Warm air affects my leaves and the conditions for evaporation.',dc:'Air temperature affects heat exchange, but leaf temperature also depends on sunlight, transpiration and wind.'},
+vpd:{whole:topFlow.split('<path').slice(-2).map(s=>'<path'+s).join('')+path('M111 35Q77 18 56 22',blue,false,2.5)+path('M234 62Q272 47 290 22',blue,false,3.2)+note(252,85,270,108,'Dry air'),detail:leafdraw(62,121)+`<rect x="20" y="28" width="280" height="64" rx="8" fill="${blue}" opacity=".11"/>${text(160,48,'Drier surrounding air','middle')}${[90,128,166,204].map((x,i)=>path(`M${x} 132Q${x-10} 99 ${x+4} 69`,blue,true,2.9)).join('')}${text(160,233,'Moist leaf interior','middle')}<circle cx="101" cy="189" r="7" stroke="${blue}" stroke-width="2.2" fill="none"/><circle cx="144" cy="178" r="7" stroke="${blue}" stroke-width="2.2" fill="none"/>${text(160,260,'Greater vapor pressure difference','middle')}`,wc:'When the air is dry relative to saturation, it can draw more water vapor from my leaves.',dc:'The vapor pressure difference between moist leaf interiors and air helps drive water loss; stomata regulate the exchange.'},
+light:{whole:sun(278,36,16)+path('M254 54L217 80',gold,false,3)+path('M252 75L224 99',gold,false,3)+path('M255 28L200 46',gold,false,3),detail:sun(160,53,20)+leafdraw(73,122)+[112,160,208].map(x=>path(`M${x} 86L${x} 131`,gold,true,3)).join('')+`<ellipse cx="153" cy="170" rx="25" ry="13" fill="${leaf}" stroke="${ink}" stroke-width="1"/><path d="M141 166l24 8M141 171l20 6" stroke="${light}" stroke-width="2"/>${text(160,234,'Chloroplasts capture light','middle')}${text(160,260,'Energy for photosynthesis','middle')}`,wc:'Sunlight reaching the landscape provides energy for photosynthesis and warms exposed surfaces.',dc:'Chloroplasts capture light energy, helping convert carbon dioxide and water into sugars.'},
+leaf:{whole:sun(277,31,13)+path('M263 55L239 80',gold,false,2.8)+path('M227 92Q236 58 243 44',blue,false,2.8)+sensor(201,83,38,25)+note(239,102,266,122,'Leaf sensor'),detail:leafdraw(53,120)+sun(241,50,16)+path('M225 75L201 120',gold,true,2.7)+vapors(81,143,4)+`<rect x="19" y="37" width="104" height="43" rx="7" fill="${heat}" opacity=".12"/>${text(71,54,'Air 27°C','middle')}${text(71,69,'example','middle')}<rect x="190" y="225" width="112" height="42" rx="7" fill="${blue}" opacity=".14"/>${text(246,243,'Leaf 25°C','middle')}${text(246,257,'example','middle')}${text(19,278,'Evaporation removes heat')}`,wc:'Sunlight warms my leaves, while evaporation can cool them relative to the surrounding air.',dc:'Energy absorbed from sunlight and transferred through air and evaporation helps determine leaf temperature.'},
+rain:{whole:cloud(38,20)+[31,58,91,125,254,278].map((x,i)=>path(`M${x} ${54+i%2*5}L${x-7} ${107+i%2*8}`,blue,false,2.5)).join('')+path('M69 143L69 221',blue,false,2.7)+path('M207 152L207 223',blue,false,2.7)+path('M161 146L161 222',blue,false,2.7)+drops([[78,254],[200,256],[116,276]]),detail:cloud(119,33)+leafdraw(72,117)+[77,115,160,210,245].map(x=>path(`M${x} 66L${x-9} 119`,blue,true,2.5)).join('')+drops([[110,158],[149,141],[206,149]])+path('M80 190L69 247',blue,true,2.7)+path('M221 190L231 247',blue,true,2.7)+`<rect x="0" y="253" width="320" height="47" fill="${soil}"/>${text(160,283,'Throughfall to soil','middle')}${text(155,203,'Canopy interception','middle')}`,wc:'Some rain is intercepted by my leaves and branches. Some drips through or down my trunk into the soil.',dc:'Rain can remain on leaves and evaporate, or reach the ground and potentially replenish soil water.'},
+humidity:{whole:[ [49,42],[69,27],[243,27],[266,56],[288,95],[52,151],[262,160] ].map(([x,y])=>dot(x,y,4,blue)).join('')+path('M195 91Q216 69 221 43',blue,false,2.4)+sensor(268,127,23,26)+note(270,140,244,171,'RH sensor'),detail:leafdraw(66,128)+`<rect x="20" y="22" width="280" height="83" rx="8" fill="${blue}" opacity=".1"/>${[[40,45],[70,67],[96,36],[119,80],[145,47],[171,75],[195,37],[224,58],[254,40],[280,74]].map(([x,y])=>dot(x,y,3.5,blue)).join('')}${text(160,18,'Water vapor in the air','middle')}${path('M110 149Q113 106 113 83',blue,true,2.4)}${path('M165 145Q168 105 168 83',blue,true,2.4)}${text(160,240,'Relative humidity at this temperature','middle')}`,wc:'Air around my canopy contains water vapor. Relative humidity describes how close it is to saturation at the current temperature.',dc:'At a given temperature, higher relative humidity usually reduces the evaporative demand on my leaves.'}
+};
+function render(){const d=D[$('#tt-param').value];$('#tt-tree-overlay').innerHTML=d.whole;$('#tt-detail-overlay').innerHTML=d.detail;$('#tt-tree-caption').textContent=d.wc;$('#tt-detail-caption').textContent=d.dc;$('#tt-tree-diagram').setAttribute('aria-label',d.wc);$('#tt-detail-diagram').setAttribute('aria-label',d.dc)}$('#tt-param').addEventListener('change',render);render();})();
+</script>
+<script>
+(()=>{
+  const root=document.getElementById('tt-schematic-drafts'),picker=root.querySelector('#tt-param'),button=root.querySelector('#tt-motion-play'),label=button.querySelector('span'),status=root.querySelector('#tt-motion-state'),ns='http://www.w3.org/2000/svg';
+  const panel=root.closest('[role="tabpanel"]'),visualPanel=root.closest('#tt-view-schematic'),motion=window.matchMedia('(prefers-reduced-motion: reduce)');
+  let frame=0,playing=false,userPaused=motion.matches,particles=[],rings=[];
+  const msg={sap:'Roots → xylem → leaves → atmosphere',stem:'Water loss → shrinking; rehydration → swelling',soil:'Soil water → root uptake',air:'Heat exchange around the canopy',vpd:'Water vapor → drier surrounding air',light:'Light → photosynthetic pigments',leaf:'Solar energy in → evaporation out',rain:'Rain → canopy → soil',humidity:'Vapor moving from the leaf to the air'};
+  function clearMotion(){cancelAnimationFrame(frame);particles.forEach(p=>p.dot.remove());rings.forEach(r=>r.node.setAttribute('r',r.radius));particles=[];rings=[];playing=false;}
+  function updateControl(message){label.textContent=userPaused?'Play animation':'Pause animation';button.setAttribute('aria-pressed',String(!userPaused));status.textContent=message;}
+  function circle(overlay,color){const node=document.createElementNS(ns,'circle');node.setAttribute('r','4.6');node.setAttribute('fill',color);node.setAttribute('stroke','var(--paper)');node.setAttribute('stroke-width','1.4');node.setAttribute('visibility','hidden');node.setAttribute('aria-hidden','true');node.style.pointerEvents='none';overlay.appendChild(node);return node;}
+  function start(){
+    clearMotion();
+    if(userPaused){updateControl(motion.matches?'Motion is paused · reduced-motion preference':'Animation paused');return;}
+    if(document.hidden||(panel&&panel.hidden)||(visualPanel&&visualPanel.hidden)){updateControl('Animation resumes when this tab is visible');return;}
+    const metric=picker.value,overlays=[root.querySelector('#tt-tree-overlay'),root.querySelector('#tt-detail-overlay')];
+    overlays.forEach((overlay,k)=>{
+      if(overlay.closest('section').hidden)return;
+      const marks=Array.from(overlay.querySelectorAll('path[marker-end]'));
+      marks.forEach((path,i)=>{
+        let length;try{length=path.getTotalLength();}catch{return;}if(!length)return;
+        let start=0.15+i*.10;
+        if(metric==='sap'&&k===0)start=i<2?.15:i===2?1:i<5?1.95:2.8;
+        if(metric==='rain')start=k===0?(i<6?.1:1.6):(i<5?.1:1.55);
+        if(metric==='sap'&&k===1)start=i<3?.7:2.5;
+        const duration=Math.min(1.2+length/250,1.8);
+        for(let j=0;j<(length>45?2:1);j++)particles.push({dot:circle(overlay,path.getAttribute('stroke')||'var(--water)'),path,length,start:start+j*.42,duration});
+      });
+    });
+    if(metric==='stem'&&!overlays[1].closest('section').hidden){const right=overlays[1].querySelector('g[transform="translate(237 137)"]');if(right)rings=Array.from(right.querySelectorAll('circle')).slice(1).map(node=>({node,radius:Number(node.getAttribute('r'))}));}
+    updateControl(msg[metric]+' · looping');playing=true;
+    const cycle=Math.max(5.3,...particles.map(p=>p.start+p.duration+.3));const started=performance.now();
+    function tick(now){
+      if(!playing)return;
+      const elapsed=((now-started)/1000)%cycle;
+      particles.forEach(p=>{const t=(elapsed-p.start)/p.duration;if(t<0||t>1){p.dot.setAttribute('visibility','hidden');return;}const xy=p.path.getPointAtLength(p.length*t);p.dot.setAttribute('cx',xy.x);p.dot.setAttribute('cy',xy.y);p.dot.setAttribute('visibility','visible');});
+      if(rings.length){const smooth=t=>t*t*(3-2*t);const shrink=smooth(Math.max(0,Math.min(1,(elapsed-.6)/2.4))),recover=smooth(Math.max(0,Math.min(1,(elapsed-(cycle-1.3))/1.3)));const hydration=1-shrink+recover; rings.forEach(r=>r.node.setAttribute('r',r.radius*(1+(54/46-1)*hydration)));}
+      frame=requestAnimationFrame(tick);
+    }
+    frame=requestAnimationFrame(tick);
+  }
+  button.addEventListener('click',()=>{userPaused=!userPaused;start();});
+  picker.addEventListener('change',start);
+  root.querySelectorAll('[data-anatomy]').forEach(b=>b.addEventListener('click',()=>{root.querySelectorAll('[data-anatomy]').forEach(n=>n.setAttribute('aria-pressed',String(n===b)));root.querySelectorAll('[data-anatomy-view]').forEach(v=>v.hidden=v.dataset.anatomyView!==b.dataset.anatomy);start();}));
+  document.addEventListener('visibilitychange',start);
+  if(panel){new MutationObserver(start).observe(panel,{attributes:true,attributeFilter:['hidden']});}if(visualPanel){new MutationObserver(start).observe(visualPanel,{attributes:true,attributeFilter:['hidden']});}
+  if(motion.addEventListener)motion.addEventListener('change',()=>{userPaused=motion.matches;start();});
+  start();
+})();
+</script>
+</div>
+
+</div><div id="tt-view-chart" hidden>  <div class="chart"><div class="chart-head"><h3 id="tt-chart-title">Water flow today</h3><div class="switch" aria-label="Time range"><button data-range="day" aria-pressed="true">Today</button><button data-range="week" aria-pressed="false">7 days</button></div></div><svg class="plot" id="tt-chart" viewBox="0 0 360 160" role="img" aria-label="Illustrative sap velocity over time"></svg><p class="small muted" id="tt-chart-note">Sap velocity is not a direct estimate of whole-tree water use.</p></div>
+</div></div></div></div>
+</section>
+<section id="tt-value" class="panel value" role="tabpanel" aria-labelledby="tt-value-tab" hidden>
+  <div class="intro"><div><div class="label">Climate mitigation · Sustainable landscapes</div><h2>How I affect my environment</h2><p class="muted small">From daily cooling to the carbon stored in my tissues, I can help create a more climate-resilient place.</p></div><span class="badge">Illustrative values</span></div>
+<div class="mobile-topic-picker"><label for="tt-mobile-value">Choose an ecosystem service</label><select id="tt-mobile-value" data-mobile-group="value"><option value="microclimate" selected>Local microclimate</option><option value="carbon">Carbon storage & gain</option><option value="water">Water use & cooling</option><option value="canopy">Shade & habitat</option><option value="rain">Rain interception</option><option value="care">Climate-smart care</option></select></div><div class="detail-layout"><aside class="detail-rail" aria-label="Explore value topics"><div class="topic-list"><button type="button" class="topic-choice" data-nav-group="value" data-nav-key="microclimate" data-nav-target="microclimate" aria-pressed="true"><strong>Local microclimate</strong><small>2°C cooler</small></button><button type="button" class="topic-choice" data-nav-group="value" data-nav-key="carbon" data-nav-target="carbon" aria-pressed="false"><strong>Carbon storage & gain</strong><small>1.2 t C · 35 kg/year</small></button><button type="button" class="topic-choice" data-nav-group="value" data-nav-key="water" data-nav-target="water" aria-pressed="false"><strong>Water use & cooling</strong><small>80 L/day · 54 kWh/day</small></button><button type="button" class="topic-choice" data-nav-group="value" data-nav-key="canopy" data-nav-target="canopy" aria-pressed="false"><strong>Shade & habitat</strong><small>113 m² canopy</small></button><button type="button" class="topic-choice" data-nav-group="value" data-nav-key="rain" data-nav-target="rain" aria-pressed="false"><strong>Rain interception</strong><small>Model-based</small></button><button type="button" class="topic-choice" data-nav-group="value" data-nav-key="care" data-nav-target="care" aria-pressed="false"><strong>Climate-smart care</strong><small>How you can help</small></button></div></aside><div class="detail-pane"><div class="selected-topic" data-topic-group="value" data-topic-key="microclimate">  <section class="climate-compare"><div><div class="label">Climate adaptation · My local microclimate</div><h3>It's cooler under my branches.</h3><p class="small muted">Two paired temperature and humidity sensors at the same height — one in my shade, one in a nearby open area.</p></div><div class="compare-grid" aria-label="Illustrative paired air temperature and relative humidity observations"><div class="compare-place"><strong>Under my canopy</strong><div class="compare-temperature">27°C</div><span class="compare-rh">50% relative humidity</span></div><div class="compare-place open"><strong>Nearby open area</strong><div class="compare-temperature">29°C</div><span class="compare-rh">43% relative humidity</span></div></div><p class="delta">2°C cooler in my shade</p><p class="small">My canopy intercepts sunlight, and water evaporating from my leaves absorbs heat. This paired contrast illustrates a local microclimate difference; it cannot isolate transpiration from shade or other site effects.</p><details><summary>What do temperature and humidity tell us?</summary><p>Air temperature describes how warm the air is near the sensors. Relative humidity tells us how close the air is to saturation at that temperature. Measuring both at comparable sites helps describe the microclimate and calculate how strongly the air draws water from leaves.</p><p>These are example readings, not actual observations. The pilot would use matched, radiation-shielded sensors at the same height in comparable locations.</p></details></section>
+</div><div class="selected-topic" data-topic-group="value" data-topic-key="carbon" hidden>  <div class="feature"><div class="label">Climate mitigation · My lifetime carbon story</div><div class="carbon">1.2 <small>metric tons C</small></div><h3>That's how much carbon I have stored in my living woody tissues and roots.</h3><div style="border-top:1px solid var(--line);padding-top:10px"><div class="number">4.4 <span class="unit">metric tons CO₂</span></div><p class="small muted">The mass of atmospheric carbon dioxide containing the same amount of carbon.</p></div><p class="small muted">A modeled estimate of current carbon stock, not a live sensor measurement or my total lifetime carbon uptake. Keeping healthy mature trees helps preserve this store; carbon may be released when wood decomposes or burns.</p></div>
+<div class="service"><h3><i data-lucide="trending-up" aria-hidden="true"></i> Annual carbon gain</h3><div class="number">35 <span class="unit">kg C/year</span></div><p>Estimated annual increase in my biomass carbon stock (≈128 kg CO₂); it is not a live photosynthesis reading.</p></div><p class="small muted">Estimated from tree species, stem diameter and height, with annual biomass growth; stock and annual gain are different quantities.</p></div><div class="selected-topic" data-topic-group="value" data-topic-key="water" hidden><div class="service"><h3><i data-lucide="droplets" aria-hidden="true"></i> Water transport</h3><div class="number">80 <span class="unit">L/day</span></div><p>Estimated whole-tree sap flow over a warm illustrative day, using calibrated scaling.</p></div><div class="service"><h3><i data-lucide="thermometer-sun" aria-hidden="true"></i> Evaporative cooling</h3><div class="number">54 <span class="unit">kWh/day</span></div><p>Approximate energy absorbed if 80 liters transpire. This is latent heat, not electricity saved or a measured air-temperature change.</p></div><p class="small muted">These two estimates are linked: water moving through sapwood can ultimately be transpired, and evaporation absorbs heat. Actual whole-tree estimates require sapwood scaling and assumptions about water storage.</p></div><div class="selected-topic" data-topic-group="value" data-topic-key="canopy" hidden><div class="service"><h3><i data-lucide="sun" aria-hidden="true"></i> My canopy</h3><div class="number">113 <span class="unit">m²</span></div><p>Estimated crown projection area, offering shade and habitat.</p></div><div class="service"><h3><i data-lucide="bird" aria-hidden="true"></i> Wildlife habitat</h3><div class="number" style="font-size:21px;white-space:normal">Living home</div><p>As a red oak, I offer food and shelter to many insects, birds and other animals.</p></div><p class="small muted">A large healthy crown provides shade and living habitat. Protecting mature trees helps retain these benefits.</p></div><div class="selected-topic" data-topic-group="value" data-topic-key="rain" hidden><div class="service"><h3><i data-lucide="cloud-rain" aria-hidden="true"></i> Rain interception</h3><div class="number" style="font-size:21px;white-space:normal">Model-based</div><p>My leaves and branches intercept rain, some of which evaporates before reaching the ground. A modeled benefit, using weather and canopy data.</p></div><p class="small muted">Rainfall from a nearby weather station and canopy characteristics can support an estimate. Interception is not the same as total runoff avoided.</p></div><div class="selected-topic" data-topic-group="value" data-topic-key="care" hidden>  <div class="climate-link"><div class="label">What can we do?</div><h3>Help trees thrive in a changing climate.</h3><p>Protect their rooting space, avoid soil compaction, choose species suited to their site, manage water responsibly, and preserve healthy mature canopies. Together these practices can help trees keep delivering shade, cooling and other environmental benefits.</p></div><details><summary>How are these benefits estimated?</summary><p>Carbon uses tree species, diameter and height in biomass equations. Annual gain uses measured or modeled growth. Water use requires scaling sap velocity to the conducting sapwood; cooling is derived from estimated transpiration. Rain interception can be modeled with local weather and canopy information. Estimates have uncertainty and change over time.</p></details>
+</div></div></div>
+</section>
+<section id="tt-life" class="panel life" role="tabpanel" aria-labelledby="tt-life-tab" hidden>
+  <div class="intro"><div><div class="label">My biography</div><h2>I've been growing here for decades.</h2><p class="small muted">Example profile, not a verified individual.</p></div><span class="badge">Meet the red oak</span></div>
+<div class="mobile-topic-picker"><label for="tt-mobile-life">Choose part of my life story</label><select id="tt-mobile-life" data-mobile-group="life"><option value="profile" selected>About me</option><option value="spring">Spring</option><option value="summer">Summer</option><option value="autumn">Autumn</option><option value="winter">Winter</option><option value="wildlife">My wildlife</option></select></div><div class="detail-layout"><aside class="detail-rail" aria-label="Explore life topics"><div class="topic-list"><button type="button" class="topic-choice" data-nav-group="life" data-nav-key="profile" data-nav-target="profile" aria-pressed="true"><strong>About me</strong><small>Age, height & size</small></button><button type="button" class="topic-choice" data-nav-group="life" data-nav-key="spring" data-nav-target="season" aria-pressed="false" data-season="spring"><strong>Spring</strong><small>Awakening</small></button><button type="button" class="topic-choice" data-nav-group="life" data-nav-key="summer" data-nav-target="season" aria-pressed="false" data-season="summer"><strong>Summer</strong><small>Growing</small></button><button type="button" class="topic-choice" data-nav-group="life" data-nav-key="autumn" data-nav-target="season" aria-pressed="false" data-season="autumn"><strong>Autumn</strong><small>Preparing</small></button><button type="button" class="topic-choice" data-nav-group="life" data-nav-key="winter" data-nav-target="season" aria-pressed="false" data-season="winter"><strong>Winter</strong><small>Resting</small></button><button type="button" class="topic-choice" data-nav-group="life" data-nav-key="wildlife" data-nav-target="wildlife" aria-pressed="false"><strong>My wildlife</strong><small>Food & shelter</small></button></div></aside><div class="detail-pane"><div class="selected-topic" data-topic-group="life" data-topic-key="profile">  <div class="feature"><div class="label">About me</div><h3>I started small. Today, my branches reach high above you.</h3><p>I'm a northern red oak, a deciduous tree native to eastern North America. I grow new leaves every spring and shed them in the fall. My acorns and branches are part of the local food web.</p><div class="fact-list"><div class="fact"><span class="small muted">Approximate age</span><strong>65 years</strong></div><div class="fact"><span class="small muted">Height</span><strong>21 m</strong></div><div class="fact"><span class="small muted">Trunk diameter</span><strong>62 cm</strong></div><div class="fact"><span class="small muted">Crown spread</span><strong>12 m</strong></div></div></div>
+</div><div class="selected-topic" data-topic-group="life" data-topic-key="season" hidden>  <div class="message" aria-live="polite"><div class="label" id="tt-season-label">Spring · Awakening</div><h3 id="tt-season-title">I'm growing a whole new canopy.</h3><p id="tt-season-copy">As days become warmer and longer, my buds open and leaves begin photosynthesizing. My water use and growth begin to pick up.</p></div>
+</div><div class="selected-topic" data-topic-group="life" data-topic-key="wildlife" hidden>  <div class="feature"><div class="label">My ecological neighbors</div><h3>What wildlife might visit me?</h3><p>Oaks support caterpillars and other insects, which in turn provide food for birds. Acorns are eaten and dispersed by animals such as squirrels and jays. Cavities and branches can also provide shelter.</p></div>
+</div></div></div>
+</section>
+<section id="tt-survey" class="panel survey" role="tabpanel" aria-labelledby="tt-survey-tab" hidden>
+  <div class="intro"><div><div class="label">Our community</div><h2>Tell me your tree story.</h2><p class="small muted">Have you noticed me before? Do I remind you of another tree? I'd love to hear what trees mean to you.</p></div><span class="badge">Community space</span></div>
+<div class="mobile-topic-picker"><label for="tt-mobile-community">Choose a community activity</label><select id="tt-mobile-community" data-mobile-group="community"><option value="share" selected>Share a story</option><option value="stories">Visitor stories</option><option value="poll">Anonymous poll</option></select></div><div class="detail-layout"><aside class="detail-rail" aria-label="Explore community topics"><div class="topic-list"><button type="button" class="topic-choice" data-nav-group="community" data-nav-key="share" data-nav-target="share" aria-pressed="true"><strong>Share a story</strong><small>Leave a note or photo</small></button><button type="button" class="topic-choice" data-nav-group="community" data-nav-key="stories" data-nav-target="stories" aria-pressed="false"><strong>Visitor stories</strong><small>Example contributions</small></button><button type="button" class="topic-choice" data-nav-group="community" data-nav-key="poll" data-nav-target="poll" aria-pressed="false"><strong>Anonymous poll</strong><small>Your perception</small></button></div></aside><div class="detail-pane"><div class="selected-topic" data-topic-group="community" data-topic-key="share">  <div class="community-card"><div class="label">Share something with me</div><h3>Leave a note, a memory, or a photo</h3><form class="community-form" id="tt-story-form">
+    <label for="tt-note">Your story <span class="small muted">(optional if sharing a picture)</span></label><textarea id="tt-note" maxlength="600" rows="3" placeholder="Today I stopped under your branches and…"></textarea><div class="count small muted" id="tt-note-count">0 / 600</div>
+    <label class="photo-button" for="tt-photo"><i data-lucide="image-plus" aria-hidden="true"></i><span>Add a photo <small>JPG, PNG or WebP · up to 8 MB</small></span></label><input type="file" id="tt-photo" accept="image/jpeg,image/png,image/webp" class="file-input">
+    <div id="tt-photo-preview" class="photo-preview" hidden><img id="tt-photo-img" alt="Your selected photo preview"><div><p id="tt-photo-name"></p><button type="button" id="tt-photo-remove">Remove photo</button></div></div><p id="tt-photo-error" class="small" role="alert" hidden></p>
+    <label class="consent"><input type="checkbox" id="tt-permission" required><span>I agree that my contribution could be displayed publicly after review, and that I have permission to share any attached photo.</span></label><p class="small muted">Please avoid identifying details or recognizable people in photos. Contributions would be reviewed before appearing here. This demo does not send or save your words or pictures.</p>
+    <button type="submit" class="submit" id="tt-story-submit">Submit for review</button><p id="tt-story-error" role="alert" class="small" hidden></p>
+  </form><div class="confirmation-inline" id="tt-story-confirm" hidden role="status"><i data-lucide="check-circle" aria-hidden="true"></i><div><h3>Thank you for sharing!</h3><p class="small">Your example reached the review confirmation. Nothing has been posted or transmitted.</p><button type="button" id="tt-story-again">Write another story</button></div></div></div>
+</div><div class="selected-topic" data-topic-group="community" data-topic-key="stories" hidden>  <div class="community-feed"><div><div class="label">From people who stopped by</div><h3>Stories under my branches</h3><p class="small muted">Illustrative examples of posts after curation</p></div>
+    <article class="visitor-story"><div class="avatar"><i data-lucide="leaf" aria-hidden="true"></i></div><div><div class="story-meta">Campus visitor <span>· Example</span></div><p>“I walk past this oak on my way to class every day. Today was the first time I actually stopped and thought about how much is happening inside it.”</p></div></article>
+    <article class="visitor-story"><div class="avatar"><i data-lucide="trees" aria-hidden="true"></i></div><div><div class="story-meta">Anonymous visitor <span>· Example</span></div><p>“It reminds me of the oak in my grandparents' garden. We used to collect acorns in the fall.”</p></div></article>
+  </div>
+</div><div class="selected-topic" data-topic-group="community" data-topic-key="poll" hidden>  <div class="community-card"><div class="label">A quick anonymous poll</div><h3>Do you see trees differently now?</h3><p class="small muted">Your perspective helps us shape the experience.</p><form class="survey-form" id="tt-survey-form">
+    <fieldset><legend>After exploring Talking Trees, how has your overall perception of trees changed?</legend><div class="answers"><label><input name="perception" type="radio" value="much_more" required> Much more positive</label><label><input name="perception" type="radio" value="somewhat_more"> Somewhat more positive</label><label><input name="perception" type="radio" value="same"> No change</label><label><input name="perception" type="radio" value="somewhat_less"> Somewhat less positive</label><label><input name="perception" type="radio" value="much_less"> Much less positive</label><label><input name="perception" type="radio" value="unsure"> I'm not sure</label></div></fieldset>
+    <button type="submit" class="submit">Share my perspective</button><p class="survey-note">Optional and separate from public stories. No vote is recorded or sent in this demo.</p>
+  </form><div class="confirm" id="tt-survey-confirm" role="status" aria-live="polite" hidden><i data-lucide="heart-handshake" aria-hidden="true"></i><h2>Thanks for seeing me!</h2><p>Your example vote was not recorded or sent.</p><button type="button" id="tt-survey-reset">Try again</button></div></div>
+</div></div></div>
+</section>
+<footer>Talking Trees · Tree physiology and sustainability education<br>All numbers, species details and trends are illustrative; no installed live sensor is connected.</footer>
+<script>
+(()=>{const root=document.getElementById('tt-three-stories');const $=s=>root.querySelector(s),$$=s=>[...root.querySelectorAll(s)];let metric='sap',range='day';const tabs=$$('[role=tab]');function setTab(tab){tabs.forEach(t=>{const active=t===tab;t.setAttribute('aria-selected',String(active));$('#'+t.getAttribute('aria-controls')).hidden=!active})}tabs.forEach((t,i)=>{t.addEventListener('click',()=>setTab(t));t.addEventListener('keydown',e=>{if(['ArrowLeft','ArrowRight','Home','End'].includes(e.key)){e.preventDefault();const j=e.key==='Home'?0:e.key==='End'?tabs.length-1:(i+(e.key==='ArrowRight'?1:tabs.length-1))%tabs.length;setTab(tabs[j]);tabs[j].focus()}})});const form=$('#tt-survey-form'),confirmation=$('#tt-survey-confirm');form.addEventListener('submit',e=>{e.preventDefault();form.reset();form.hidden=true;confirmation.hidden=false;$('#tt-survey-reset').focus()});$('#tt-survey-reset').addEventListener('click',()=>{confirmation.hidden=true;form.hidden=false;form.querySelector('input').focus()});
+const D={sap:['Water flow','cm/h',0,24,[2,1,1,4,9,16,22,18],[14,20,17,23,13,8,18],"I'm moving water up to my leaves.",'On a sunny afternoon, water moves up through my trunk to replace some of the water lost from my leaves.','Sap velocity is not a direct estimate of whole-tree water use.'],stem:['Trunk diameter change','µm',-70,20,[0,5,12,10,-8,-39,-58,-45],[-15,-26,-48,-60,-24,6,-45],"My trunk has shrunk a little today.",'My stem can shrink temporarily as water is used by my leaves, then swell again as I rehydrate.','Daily diameter changes are relative to midnight, not a direct measure of growth.'],soil:['Soil moisture','%',15,35,[30,30,29,28,27,25,24,23],[30,27,25,22,20,30,23],"The soil around my roots is drying.",'Water stored in the soil helps supply my roots. Today, the soil moisture sensor is reading lower than it did this morning.','A point measurement reflects conditions near the sensor, not my whole root zone.'],air:['Air temperature','°C',10,35,[16,14,13,16,21,26,29,27],[23,28,26,31,24,20,27],"The air around me is warming up.",'Warmer air can increase evaporative demand, particularly when humidity is low.','Temperature alone does not establish tree stress.'],vpd:['Vapor pressure deficit','kPa',0,3,[.2,.2,.3,.4,.9,1.6,2.5,2.3],[1,1.6,1.4,2.6,1.2,.7,2.3],"The air is thirsty today.",'Vapor pressure deficit describes how strongly the air draws water from wet surfaces, including my leaves.','VPD is calculated from air temperature and relative humidity.'],light:['Solar radiation','W/m²',0,800,[0,0,0,60,250,480,700,520],[460,600,420,740,300,180,520],"I'm catching sunlight.",'My leaves use light as the energy source for photosynthesis.','Nearby weather-station broadband solar radiation; not direct PAR or light absorbed by my crown.'],leaf:['Leaf temperature','°C',10,35,[15,13,12,15,20,24,27,25],[22,25,24,29,23,19,25],"My leaf is cooler than the air.",'Water evaporating from a leaf can absorb heat, although radiation and wind also influence its temperature.','Temperature at one measured leaf or representative spot.'],rain:['Cumulative rainfall','mm',0,6,[0,1.2,4.2,4.2,4.2,4.2,4.2,4.2],[0,2,0,.5,0,3.5,4.2],"I received some rain this morning.",'Some rain flows into the soil near my roots. Some is held temporarily on my leaves and branches.','Proposed nearby weather-station data. Today: cumulative rainfall; seven days: each daily total.'],humidity:['Relative humidity','%',30,100,[88,92,94,83,69,55,43,50],[65,54,62,41,72,81,50],"The air is less humid than this morning.",'When the air is drier, evaporation may increase — especially when it is warm.','Relative humidity is measured near the tree.']};
+const seasons={spring:['Spring · Awakening',"I'm growing a whole new canopy.",'As days become warmer and longer, my buds open and leaves begin photosynthesizing. My water use and growth begin to pick up.'],summer:['Summer · Growing',"I'm working through hot afternoons.",'My leaves use sunlight and release water. When soil dries or the air becomes demanding, I can partly close the tiny pores in my leaves.'],autumn:['Autumn · Preparing',"I'm letting go of my leaves.",'As daylight decreases, I recover some nutrients before shedding leaves. Acorns may provide food for wildlife.'],winter:['Winter · Resting',"I'm quiet, but still alive.",'I have no green leaves right now. My buds and living tissues persist through winter, ready for spring.']};
+const edu={
+  sap:["Sap velocity tells us how quickly water travels through the water-conducting tissue (xylem) in my trunk.","Local sap flow sensor · point measurement. Whole-tree water use requires calibration and scaling to conducting sapwood.","Transpiration helps cool my leaves and can cool my surroundings. Heat and drought change water transport, and healthy roots help sustain this service.","Landscape lesson: protect my roots and soil so I can continue to take up water."],
+  stem:["My trunk expands and contracts as living tissues gain and lose water; sustained increase over longer periods can reflect growth.","Local electronic dendrometer · diameter change relative to midnight. Reversible swelling is not new wood.","A tree may draw on stored water during hot days, then refill its tissues overnight. Observing those patterns helps us discuss drought recovery and the limits of cooling during water stress.","Landscape lesson: protect rooting space and manage water during dry periods. Avoid diagnosing damage from one day of shrinkage."],
+  soil:["Volumetric water content is the fraction of soil volume made up of water. My roots draw water from the soil, but the amount accessible also depends on soil type and root distribution.","Local soil moisture sensor · conditions near the probe, not the entire root zone.","Dry soil can restrict uptake, lower transpiration, and impair growth. Healthy, permeable soil helps urban trees endure dry weather and sustain ecosystem services.","Landscape lesson: protect soil from compaction, preserve infiltration and use suitable mulch."],
+  vpd:["Vapor pressure deficit (VPD) describes the difference between the air's actual water vapor pressure and its saturation vapor pressure at the measured air temperature. Warm, dry air generally has a higher VPD.","Calculated from the open-area temperature and humidity sensors (example: 29°C and 43% RH ≈ 2.3 kPa).", "High VPD raises atmospheric demand for water. If trees cannot replace lost water, they may close their stomata, limiting water loss and potentially photosynthesis and evaporative cooling.","Landscape lesson: preserving healthy trees and sufficient soil water can help sustain cooling during hot, dry weather."],
+  light:["Solar radiation measures the energy from sunlight arriving at an open weather station. Part of that energy powers photosynthesis, while some warms leaves and their surroundings.","Proposed nearby weather station · broadband radiation (W/m²), not canopy PAR or absorbed light.","Sunlight supports carbon uptake but also increases leaf heat load. A tree's crown intercepts sunlight, reducing direct solar exposure beneath it.","Landscape lesson: strategically preserve or plant canopy cover where people need shade."],
+  rain:["Rainfall measures water delivered by precipitation. Some reaches soil, some is held on leaves or branches, and some runs off or evaporates.","Proposed nearby weather station · cumulative rainfall today; hourly observations, not rain measured under this tree.","Water replenishment helps trees recover from drought. Canopies and permeable soil also influence how rainfall reaches the ground and moves through landscapes.","Landscape lesson: retain permeable rooting zones so rainfall can infiltrate rather than rapidly run off."]
+};
+const svg=$('#tt-chart'),NS='http://www.w3.org/2000/svg';function el(tag,a,t){const n=document.createElementNS(NS,tag);Object.entries(a).forEach(([k,v])=>n.setAttribute(k,v));if(t!==undefined)n.textContent=t;svg.appendChild(n);return n}function draw(){const d=D[metric],vals=d[range==='day'?4:5],l=43,r=348,t=24,b=129,x=i=>l+(r-l)*i/(vals.length-1),y=v=>b-(v-d[2])/(d[3]-d[2])*(b-t);$('#tt-story-title').textContent=d[6];$('#tt-story-text').textContent=d[7];$('#tt-chart-title').textContent=d[0]+(range==='day'?' today':' over 7 days');$('#tt-chart-note').textContent=d[8];const e=edu[metric];$('#tt-edu-what').textContent=e[0];$('#tt-edu-source').textContent='Source: '+e[1];$('#tt-edu-why').textContent=e[2];$('#tt-edu-action').textContent=e[3];svg.innerHTML='';svg.setAttribute('aria-label',d[0]+', illustrative '+range+' trend in '+d[1]);el('text',{x:l,y:12},d[1]);for(let k=0;k<4;k++){const v=d[2]+(d[3]-d[2])*k/3;el('line',{x1:l,x2:r,y1:y(v),y2:y(v),stroke:'var(--line)'});el('text',{x:l-6,y:y(v)+4,'text-anchor':'end'},Number(v.toFixed(d[3]<=6?1:0)))}const pts=vals.map((v,i)=>[x(i),y(v)]);el('polygon',{points:[[l,b],...pts,[r,b]].map(p=>p.join(',')).join(' '),fill:'var(--blue-bg)'});el('polyline',{points:pts.map(p=>p.join(',')).join(' '),fill:'none',stroke:'var(--blue)','stroke-width':2.6,'stroke-linejoin':'round','stroke-linecap':'round'});pts.forEach((p,i)=>el('circle',{cx:p[0],cy:p[1],r:i===pts.length-1?4:2.6,fill:'var(--blue)','data-tooltip':vals[i]+' '+d[1]}));const labels=range==='day'?['12 am','5 am','10 am','3 pm']:['6 days ago','4 days','2 days','Today'];labels.forEach((v,i)=>el('text',{x:l+(r-l)*i/(labels.length-1),y:150,'text-anchor':i===0?'start':i===labels.length-1?'end':'middle'},v))};$$('[data-m]').forEach(b=>b.addEventListener('click',()=>{metric=b.dataset.m;const diagramParam=$('#tt-param');diagramParam.value=metric;diagramParam.dispatchEvent(new Event('change'));$$('[data-m]').forEach(n=>n.setAttribute('aria-pressed',String(n===b)));draw()}));$$('[data-range]').forEach(b=>b.addEventListener('click',()=>{range=b.dataset.range;$$('[data-range]').forEach(n=>n.setAttribute('aria-pressed',String(n===b)));draw()}));$$('[data-season]').forEach(b=>b.addEventListener('click',()=>{$$('[data-season]').forEach(n=>n.setAttribute('aria-pressed',String(n===b)));const s=seasons[b.dataset.season];$('#tt-season-label').textContent=s[0];$('#tt-season-title').textContent=s[1];$('#tt-season-copy').textContent=s[2]}));draw()})();
+</script>
+<script>
+(()=>{const root=document.getElementById('tt-three-stories'),$=s=>root.querySelector(s),form=$('#tt-story-form'),note=$('#tt-note'),count=$('#tt-note-count'),file=$('#tt-photo'),preview=$('#tt-photo-preview'),img=$('#tt-photo-img'),fileName=$('#tt-photo-name'),photoErr=$('#tt-photo-error'),formErr=$('#tt-story-error'),confirmation=$('#tt-story-confirm');let token=0;
+function clearPhoto(){token++;file.value='';img.removeAttribute('src');preview.hidden=true;fileName.textContent='';photoErr.hidden=true}
+note.addEventListener('input',()=>{count.textContent=note.value.length+' / 600';formErr.hidden=true});
+file.addEventListener('change',()=>{const current=++token;preview.hidden=true;img.removeAttribute('src');photoErr.hidden=true;formErr.hidden=true;const f=file.files[0];if(!f)return;if(!['image/jpeg','image/png','image/webp'].includes(f.type)||f.size>8*1024*1024){file.value='';photoErr.textContent='Please choose a JPG, PNG or WebP image under 8 MB.';photoErr.hidden=false;return}fileName.textContent=f.name;const r=new FileReader();r.addEventListener('load',()=>{if(current!==token)return;img.src=r.result;preview.hidden=false});r.addEventListener('error',()=>{if(current!==token)return;clearPhoto();photoErr.textContent='This picture could not be previewed.';photoErr.hidden=false});r.readAsDataURL(f)});
+$('#tt-photo-remove').addEventListener('click',()=>{clearPhoto();file.focus()});
+form.addEventListener('submit',e=>{e.preventDefault();if(!note.value.trim()&&!file.files.length){formErr.textContent='Please add a story or select a photo.';formErr.hidden=false;note.focus();return}form.reset();clearPhoto();count.textContent='0 / 600';formErr.hidden=true;form.hidden=true;confirmation.hidden=false;$('#tt-story-again').focus()});
+$('#tt-story-again').addEventListener('click',()=>{confirmation.hidden=true;form.hidden=false;note.focus()});
+})();
+</script>
+</div>
+
+<script>
+(() => {
+  let positioningReady = window.FloatingUIDOM
+    ? Promise.resolve(window.FloatingUIDOM)
+    : null;
+  const loadScript = (src) => new Promise((resolve, reject) => {
+    const script = document.createElement("script");
+    script.src = src;
+    script.onload = resolve;
+    script.onerror = () => {
+      script.remove();
+      reject(new Error("Could not load tooltip positioning"));
+    };
+    document.head.appendChild(script);
+  });
+  const loadPositioning = async () => {
+    const domUrl = "https://unpkg.com/@floating-ui/dom@1.7.4/dist/floating-ui.dom.umd.min.js";
+    const preload = document.createElement("link");
+    preload.rel = "preload";
+    preload.as = "script";
+    preload.href = domUrl;
+    document.head.appendChild(preload);
+    try {
+      if (window.FloatingUICore == null) {
+        await loadScript("https://unpkg.com/@floating-ui/core@1.7.3/dist/floating-ui.core.umd.min.js");
+      }
+      await loadScript(domUrl);
+      return window.FloatingUIDOM;
+    } finally {
+      preload.remove();
+    }
+  };
+  const getPositioning = () => positioningReady ??= loadPositioning().catch((error) => {
+    positioningReady = null;
+    throw error;
+  });
+  const tooltipPlacements = new Set(["top", "right", "bottom", "left"]);
+  const tooltipId = `codex-visualization-tooltip-${
+    window.crypto?.randomUUID?.() ?? Date.now().toString(36)
+  }`;
+  const tooltipGap = 5;
+  const hoverDelay = 700;
+  const skipDelay = 300;
+  let activeTrigger = null;
+  let pendingTrigger = null;
+  let tooltip = null;
+  let openTimeout = null;
+  let autoUpdateCleanup = null;
+  let positionRequest = 0;
+  let skipDelayUntil = 0;
+  let lastPointerWasTouch = false;
+  let pinnedByTouch = false;
+
+  const getTrigger = (event) => {
+    for (const target of event.composedPath()) {
+      if (target?.nodeType === Node.ELEMENT_NODE) {
+        const trigger = target.closest("[data-tooltip]");
+        if (trigger) return trigger;
+      }
+    }
+    return null;
+  };
+  const containsTarget = (trigger, target) =>
+    target?.nodeType != null && trigger.contains(target);
+  const getContent = (trigger) =>
+    trigger.getAttribute("data-tooltip")?.trim() ?? "";
+  const getPlacement = (trigger) => {
+    const placement = trigger.getAttribute("data-tooltip-placement");
+    return tooltipPlacements.has(placement) ? placement : "top";
+  };
+  const getTooltip = () => {
+    if (tooltip == null) {
+      tooltip = document.createElement("div");
+      tooltip.id = tooltipId;
+      tooltip.className = "tooltip";
+      tooltip.setAttribute("role", "tooltip");
+    }
+    return tooltip;
+  };
+  const setDescribedBy = (trigger, described) => {
+    const ids = new Set(
+      (trigger.getAttribute("aria-describedby") ?? "")
+        .split(/\s+/)
+        .filter(Boolean),
+    );
+    if (described) {
+      ids.add(tooltipId);
+    } else {
+      ids.delete(tooltipId);
+    }
+    if (ids.size === 0) {
+      trigger.removeAttribute("aria-describedby");
+    } else {
+      trigger.setAttribute("aria-describedby", [...ids].join(" "));
+    }
+  };
+  const clearOpenTimeout = () => {
+    if (openTimeout != null) {
+      window.clearTimeout(openTimeout);
+      openTimeout = null;
+    }
+    pendingTrigger = null;
+  };
+  const closeTooltip = (activateSkipDelay = true) => {
+    clearOpenTimeout();
+    pinnedByTouch = false;
+    positionRequest += 1;
+    autoUpdateCleanup?.();
+    autoUpdateCleanup = null;
+    if (activeTrigger == null) {
+      return;
+    }
+    setDescribedBy(activeTrigger, false);
+    activeTrigger = null;
+    tooltip?.remove();
+    if (activateSkipDelay) {
+      skipDelayUntil = Date.now() + skipDelay;
+    }
+  };
+  const updatePosition = (trigger, floating, { computePosition, flip, offset, shift, size }) => {
+    const request = ++positionRequest;
+    void computePosition(trigger, floating, {
+      middleware: [
+        offset(tooltipGap),
+        flip({ padding: tooltipGap }),
+        shift({ padding: tooltipGap }),
+        size({
+          padding: tooltipGap,
+          apply({ availableHeight, availableWidth, elements }) {
+            elements.floating.style.setProperty(
+              "--tooltip-available-width",
+              `${Math.max(0, availableWidth)}px`,
+            );
+            elements.floating.style.setProperty(
+              "--tooltip-available-height",
+              `${Math.max(0, availableHeight)}px`,
+            );
+          },
+        }),
+      ],
+      placement: getPlacement(trigger),
+      strategy: "fixed",
+    })
+      .then(({ x, y }) => {
+        if (activeTrigger !== trigger || request !== positionRequest) {
+          return;
+        }
+        const scale = window.devicePixelRatio || 1;
+        floating.style.transform = `translate(${Math.round(x * scale) / scale}px, ${Math.round(y * scale) / scale}px)`;
+        floating.style.visibility = "visible";
+      })
+      .catch(() => {
+        if (activeTrigger === trigger && request === positionRequest) {
+          closeTooltip(false);
+        }
+      });
+  };
+  const openTooltip = (trigger) => {
+    const content = getContent(trigger);
+    if (!trigger.isConnected || content.length === 0) {
+      return;
+    }
+    clearOpenTimeout();
+    if (activeTrigger === trigger) {
+      return;
+    }
+    closeTooltip();
+    const floating = getTooltip();
+    floating.textContent = content;
+    floating.style.visibility = "hidden";
+    floating.style.transform = "translate(0, 0)";
+    document.body.appendChild(floating);
+    activeTrigger = trigger;
+    setDescribedBy(trigger, true);
+    const request = positionRequest;
+    void getPositioning().then((positioning) => {
+      if (request !== positionRequest || !trigger.isConnected) return;
+      autoUpdateCleanup = positioning.autoUpdate(trigger, floating, () => {
+        updatePosition(trigger, floating, positioning);
+      });
+    }).catch(() => {
+      if (request === positionRequest) closeTooltip(false);
+    });
+  };
+  const requestOpen = (trigger, immediate = false) => {
+    if (
+      getContent(trigger).length === 0 ||
+      activeTrigger === trigger ||
+      pendingTrigger === trigger
+    ) {
+      return;
+    }
+    clearOpenTimeout();
+    pendingTrigger = trigger;
+    const delay =
+      immediate || activeTrigger != null || Date.now() < skipDelayUntil
+        ? 0
+        : hoverDelay;
+    if (delay === 0) {
+      openTooltip(trigger);
+      return;
+    }
+    openTimeout = window.setTimeout(() => {
+      openTimeout = null;
+      pendingTrigger = null;
+      openTooltip(trigger);
+    }, delay);
+  };
+  const handlePointerOpen = (event) => {
+    if (event.pointerType === "touch") {
+      return;
+    }
+    const trigger = getTrigger(event);
+    if (trigger == null || containsTarget(trigger, event.relatedTarget)) {
+      return;
+    }
+    requestOpen(trigger);
+  };
+  const handlePointer = (event) => {
+    lastPointerWasTouch =
+      event.type === "pointerdown" && event.pointerType === "touch";
+  };
+  const handleTouchClick = (event) => {
+    const isTouch = event.pointerType === "touch" || lastPointerWasTouch;
+    lastPointerWasTouch = false;
+    if (!isTouch || event.detail === 0) {
+      return;
+    }
+    const trigger = getTrigger(event);
+    if (
+      trigger == null ||
+      !trigger.isConnected ||
+      getContent(trigger).length === 0 ||
+      (pinnedByTouch && activeTrigger === trigger)
+    ) {
+      if (pinnedByTouch) {
+        closeTooltip();
+      }
+      return;
+    }
+    openTooltip(trigger);
+    pinnedByTouch = activeTrigger === trigger;
+    window.setTimeout(() => {
+      if (activeTrigger === trigger && !trigger.isConnected) {
+        closeTooltip(false);
+      }
+    }, 0);
+  };
+  const handleLeave = (event) => {
+    if (pinnedByTouch) {
+      return;
+    }
+    const trigger = getTrigger(event);
+    if (trigger == null || containsTarget(trigger, event.relatedTarget)) {
+      return;
+    }
+    if (activeTrigger === trigger || pendingTrigger === trigger) {
+      closeTooltip();
+    }
+  };
+  const handleFocusIn = (event) => {
+    const trigger = getTrigger(event);
+    if (trigger?.matches(":focus-visible")) {
+      requestOpen(trigger, true);
+    }
+  };
+  const handleKeyDown = (event) => {
+    if (event.key === "Escape") {
+      closeTooltip();
+    }
+  };
+  const handleContextMenu = (event) => {
+    lastPointerWasTouch = false;
+    const trigger = getTrigger(event);
+    if (activeTrigger === trigger || pendingTrigger === trigger) {
+      closeTooltip();
+    }
+  };
+  const handlers = {
+    pointerover: handlePointerOpen,
+    pointerdown: handlePointer,
+    pointercancel: handlePointer,
+    click: handleTouchClick,
+    pointerout: handleLeave,
+    focusin: handleFocusIn,
+    focusout: handleLeave,
+    keydown: handleKeyDown,
+    contextmenu: handleContextMenu,
+  };
+  const roots = new Map();
+  const handledEvents = new WeakSet();
+  const handleEvent = (event) => {
+    if (handledEvents.has(event)) return;
+    handledEvents.add(event);
+    handlers[event.type](event);
+  };
+  const discoverRoots = (node) => {
+    if (node.shadowRoot) listen(node.shadowRoot);
+    for (const element of node.querySelectorAll("*")) {
+      if (element.shadowRoot) listen(element.shadowRoot);
+    }
+  };
+  const listen = (root) => {
+    if (roots.has(root)) return;
+    for (const type of Object.keys(handlers)) root.addEventListener(type, handleEvent);
+    const observer = new window.MutationObserver((records) => {
+      for (const { addedNodes } of records) {
+        for (const node of addedNodes) {
+          if (node.nodeType === Node.ELEMENT_NODE) discoverRoots(node);
+        }
+      }
+      for (const [root, cleanup] of roots) {
+        if (root.host && !root.host.isConnected) {
+          cleanup();
+          roots.delete(root);
+        }
+      }
+      if (activeTrigger && !activeTrigger.isConnected) closeTooltip(false);
+    });
+    observer.observe(root, { childList: true, subtree: true });
+    roots.set(root, () => {
+      observer.disconnect();
+      for (const type of Object.keys(handlers)) root.removeEventListener(type, handleEvent);
+    });
+    discoverRoots(root);
+  };
+  const destroy = () => {
+    closeTooltip(false);
+    lastPointerWasTouch = false;
+    for (const cleanup of roots.values()) cleanup();
+    roots.clear();
+    tooltip = null;
+  };
+
+  // Events between children of one shadow root never reach the document.
+  listen(document);
+  window.addEventListener("pagehide", destroy, { once: true });
+})();
+</script>
+<script id="codex-visualization-tabs">
+(() => {
+  const selector = '.nav[role="tablist"] [role="tab"]';
+  const disabled = ':disabled,[aria-disabled="true"]';
+  const selectTab = (selected) => {
+    const panelId = selected.getAttribute("aria-controls");
+    for (const tab of selected.closest('[role="tablist"]').querySelectorAll('[role="tab"]')) {
+      const active = tab === selected;
+      tab.classList.toggle("active", active);
+      tab.setAttribute("aria-selected", String(active));
+      const id = tab.getAttribute("aria-controls");
+      const panel = id && document.getElementById(id);
+      if (panel != null) {
+        panel.hidden = id !== panelId;
+        if (!panel.hidden && selected.id) {
+          panel.setAttribute("aria-labelledby", selected.id);
+        }
+      }
+    }
+  };
+  const interact = (event) => {
+    const tab = event.target?.closest?.(selector);
+    if (event.defaultPrevented || tab == null || tab.matches(disabled)) {
+      return;
+    }
+    if (event.type === "click") {
+      selectTab(tab);
+      return;
+    }
+    const tabs = Array.from(
+      tab.closest('[role="tablist"]').querySelectorAll('[role="tab"]'),
+    ).filter((candidate) => !candidate.matches(disabled));
+    const current = tabs.indexOf(tab);
+    let next;
+    if (event.key === "ArrowRight" || event.key === "ArrowDown") {
+      next = (current + 1) % tabs.length;
+    } else if (event.key === "ArrowLeft" || event.key === "ArrowUp") {
+      next = (current + tabs.length - 1) % tabs.length;
+    } else if (event.key === "Home") {
+      next = 0;
+    } else if (event.key === "End") {
+      next = tabs.length - 1;
+    } else {
+      return;
+    }
+    event.preventDefault();
+    tabs[next].focus();
+    selectTab(tabs[next]);
+  };
+
+  for (const list of document.querySelectorAll('.nav[role="tablist"]')) {
+    const selected =
+      list.querySelector('[role="tab"][aria-selected="true"]') ??
+      list.querySelector('[role="tab"].active') ??
+      list.querySelector('[role="tab"]');
+    if (selected != null) {
+      selectTab(selected);
+    }
+  }
+  document.addEventListener("click", interact);
+  document.addEventListener("keydown", interact);
+  window.addEventListener("pagehide", () => {
+    document.removeEventListener("click", interact);
+    document.removeEventListener("keydown", interact);
+  }, { once: true });
+})();
+</script>
+<script id="codex-visualization-carousel">
+  (() => {
+    for (const root of document.querySelectorAll(".viz-carousel")) {
+      const panels = Array.from(
+        root.querySelectorAll(":scope > [data-variant]"),
+      );
+      if (panels.length === 0) {
+        continue;
+      }
+      root.setAttribute("role", "group");
+      panels.forEach((panel, index) => {
+        panel.hidden = index !== 0;
+        panel.setAttribute("role", "group");
+        if (!panel.hasAttribute("aria-label")) {
+          panel.setAttribute("aria-label", panel.dataset.variant);
+        }
+      });
+      root.dataset.activeVariant = panels[0].dataset.variant;
+      if (panels.length === 1) {
+        continue;
+      }
+
+      const controls = document.createElement("div");
+      controls.className = "viz-carousel-controls";
+      // Portable copy of the settings dropdown's legacy glyph; no 14px icon-package preset matches it.
+      // https://github.com/openai/openai/blob/master/codex/codex-apps/webview/src/icons/chevron.svg
+      controls.innerHTML = `
+      <button type="button" class="viz-carousel-previous cursor-interaction"><i data-lucide="chevron-left" aria-hidden="true"></i></button>
+      <details class="viz-carousel-picker">
+        <summary class="cursor-interaction">
+          <span class="viz-carousel-count tabular-nums"></span>
+          <span class="viz-carousel-name"></span>
+          <svg class="viz-carousel-caret" width="14" height="14" viewBox="0 0 20 21" fill="none" aria-hidden="true" focusable="false">
+            <path d="M15.2793 7.71101C15.539 7.45131 15.961 7.45131 16.2207 7.71101C16.4804 7.97071 16.4804 8.39272 16.2207 8.65242L10.4707 14.4024C10.211 14.6621 9.78902 14.6621 9.52932 14.4024L3.77932 8.65242L3.69436 8.54792C3.52385 8.28979 3.55205 7.93828 3.77932 7.71101C4.00659 7.48374 4.3581 7.45554 4.61623 7.62605L4.72073 7.71101L10 12.9903L15.2793 7.71101Z" fill="currentColor" stroke="currentColor" stroke-width="0.6" />
+          </svg>
+        </summary>
+        <div class="viz-carousel-options">
+</div>
+      </details>
+      <button type="button" class="viz-carousel-next cursor-interaction"><i data-lucide="chevron-right" aria-hidden="true"></i></button>`;
+      const previous = controls.querySelector(".viz-carousel-previous");
+      const next = controls.querySelector(".viz-carousel-next");
+      const picker = controls.querySelector(".viz-carousel-picker");
+      const summary = picker.querySelector("summary");
+      const count = controls.querySelector(".viz-carousel-count");
+      const name = controls.querySelector(".viz-carousel-name");
+      const options = controls.querySelector(".viz-carousel-options");
+      const status = document.createElement("span");
+      status.className = "sr-only";
+      status.setAttribute("role", "status");
+      status.setAttribute("aria-live", "polite");
+      status.setAttribute("aria-atomic", "true");
+      previous.setAttribute(
+        "aria-label",
+        root.dataset.previousLabel ?? "Previous variant",
+      );
+      next.setAttribute("aria-label", root.dataset.nextLabel ?? "Next variant");
+
+      let active = 0;
+      let mousePointerId = null;
+      let summaryPointerHandled = false;
+      summary.addEventListener("pointerdown", (event) => {
+        summaryPointerHandled =
+          event.pointerType === "mouse" && event.button === 0 && !event.ctrlKey;
+        if (!summaryPointerHandled) {
+          return;
+        }
+        event.preventDefault();
+        summary.focus({ preventScroll: true });
+        picker.open = !picker.open;
+        mousePointerId = picker.open ? event.pointerId : null;
+      });
+      summary.addEventListener("click", (event) => {
+        if (summaryPointerHandled && event.detail > 0) {
+          event.preventDefault();
+        }
+      });
+      const choices = panels.map((panel, index) => {
+        const choice = document.createElement("button");
+        choice.type = "button";
+        choice.className = "cursor-interaction";
+        choice.textContent = panel.dataset.variant;
+        choice.addEventListener("click", () => {
+          select(index);
+          summary.focus();
+        });
+        choice.addEventListener("pointerup", (event) => {
+          if (
+            picker.open &&
+            event.pointerType === "mouse" &&
+            event.button === 0 &&
+            event.pointerId === mousePointerId
+          ) {
+            choice.click();
+          }
+        });
+        options.appendChild(choice);
+        return choice;
+      });
+      const select = (index) => {
+        const changed = active !== index;
+        active = index;
+        panels.forEach((panel, position) => {
+          panel.hidden = position !== active;
+          choices[position].setAttribute(
+            "aria-current",
+            String(position === active),
+          );
+        });
+        root.dataset.activeVariant = panels[active].dataset.variant;
+        count.textContent = `${active + 1} / ${panels.length}`;
+        name.textContent = panels[active].dataset.variant;
+        picker.open = false;
+        mousePointerId = null;
+        if (changed) {
+          status.textContent = `${count.textContent}: ${name.textContent}`;
+        }
+      };
+      previous.addEventListener("click", () =>
+        select((active + panels.length - 1) % panels.length),
+      );
+      next.addEventListener("click", () =>
+        select((active + 1) % panels.length),
+      );
+      picker.addEventListener("keydown", (event) => {
+        if (event.key === "Escape" && picker.open) {
+          event.preventDefault();
+          picker.open = false;
+          mousePointerId = null;
+          summary.focus();
+          return;
+        }
+        if (event.altKey || event.ctrlKey || event.metaKey) {
+          return;
+        }
+        const index = choices.indexOf(document.activeElement);
+        let nextIndex;
+        if (event.key === "ArrowDown") {
+          nextIndex = index < 0 ? active : (index + 1) % choices.length;
+        } else if (event.key === "ArrowUp") {
+          nextIndex = index < 0 ? active : (index + choices.length - 1) % choices.length;
+        } else if (picker.open && event.key === "Home") {
+          nextIndex = 0;
+        } else if (picker.open && event.key === "End") {
+          nextIndex = choices.length - 1;
+        } else {
+          return;
+        }
+        event.preventDefault();
+        picker.open = true;
+        choices[nextIndex].focus();
+      });
+      picker.addEventListener("focusout", (event) => {
+        if (!picker.contains(event.relatedTarget)) {
+          picker.open = false;
+          mousePointerId = null;
+        }
+      });
+      const dismiss = (event) => {
+        if (!summary.contains(event.target)) {
+          mousePointerId = null;
+        }
+        if (!picker.contains(event.target)) {
+          picker.open = false;
+        }
+      };
+      const endPointerSelection = () => {
+        mousePointerId = null;
+      };
+      const sizePicker = () => {
+        root.style.setProperty(
+          "--viz-carousel-picker-height",
+          `${picker.open ? options.offsetHeight : 0}px`,
+        );
+      };
+      picker.addEventListener("toggle", sizePicker);
+      window.addEventListener("resize", sizePicker);
+      document.addEventListener("pointerdown", dismiss);
+      document.addEventListener("pointerup", endPointerSelection);
+      document.addEventListener("pointercancel", endPointerSelection);
+      window.addEventListener("blur", endPointerSelection);
+      window.addEventListener(
+        "pagehide",
+        () => {
+          document.removeEventListener("pointerdown", dismiss);
+          document.removeEventListener("pointerup", endPointerSelection);
+          document.removeEventListener("pointercancel", endPointerSelection);
+          window.removeEventListener("blur", endPointerSelection);
+          window.removeEventListener("resize", sizePicker);
+        },
+        { once: true },
+      );
+      root.append(controls, status);
+      select(0);
+    }
+  })();
+</script>
+<script id="codex-visualization-lucide" async src="https://unpkg.com/lucide@1.17.0/dist/umd/lucide.js"></script>
+<script>
+(() => {
+  const initialize = () => {
+    globalThis.lucide?.createIcons({ attrs: { width: 16, height: 16 } });
+  };
+  if (globalThis.lucide != null) {
+    initialize();
+    return;
+  }
+  document
+    .getElementById("codex-visualization-lucide")
+    ?.addEventListener("load", initialize, { once: true });
+})();
+</script>
+
+
+<script>
+(()=>{const root=document.getElementById('tt-three-stories');const all=s=>[...root.querySelectorAll(s)],one=s=>root.querySelector(s);const setPick=(group,key)=>{const pick=one('[data-mobile-group="'+group+'"]');if(pick)pick.value=key;};
+  all('[data-nav-group]').forEach(b=>b.addEventListener('click',()=>{const group=b.dataset.navGroup,key=b.dataset.navKey,target=b.dataset.navTarget;all('[data-nav-group="'+group+'"]').forEach(n=>n.setAttribute('aria-pressed',String(n===b)));all('[data-topic-group="'+group+'"]').forEach(n=>n.hidden=n.dataset.topicKey!==target);setPick(group,key);}));
+  all('[data-m]').forEach(b=>b.addEventListener('click',()=>setPick('day',b.dataset.m)));
+  all('[data-mobile-group]').forEach(s=>s.addEventListener('change',()=>{const g=s.dataset.mobileGroup,key=s.value;const b=g==='day'?one('[data-m="'+key+'"]'):one('[data-nav-group="'+g+'"][data-nav-key="'+key+'"]');if(b)b.click();}));
+  all('[data-detail-visual]').forEach(b=>b.addEventListener('click',()=>{const view=b.dataset.detailVisual;all('[data-detail-visual]').forEach(n=>n.setAttribute('aria-pressed',String(n===b)));one('#tt-view-schematic').hidden=view!=='schematic';one('#tt-view-chart').hidden=view!=='chart';}));
+})();
+</script>
+</body>
+</html>
